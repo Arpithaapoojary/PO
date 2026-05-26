@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DermScan Dashboard</title>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Dashboard Styles -->
+    <link rel="stylesheet" href="../static/css/dashboard.css" />
+  </head>
+  <body>
+    <!-- Sidebar overlay (mobile) -->
+    <div
+      class="sidebar-overlay"
+      id="sidebarOverlay"
+      onclick="closeSidebar()"
+    ></div>
+
+    <!-- ─── SIDEBAR ─────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="color: #fff"
+          >
+            <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z" />
+            <path d="M12 8v4l3 3" />
+          </svg>
+        </div>
+        <div class="logo-text">Derm<span>Scan</span></div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+
+        <a class="nav-item active" href="#">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          Dashboard
+        </a>
+
+        <a
+          class="nav-item"
+          href="#"
+          onclick="
+            goHome();
+            return false;
+          "
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 5v14M5 12l7-7 7 7" />
+          </svg>
+          New Analysis
+        </a>
+
+        <div class="nav-section-label">Reports</div>
+
+        <a class="nav-item" href="#">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+            />
+            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+          </svg>
+          History
+        </a>
+
+        <a class="nav-item" href="#">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v4M12 16h.01" />
+          </svg>
+          Insights
+        </a>
+
+        <div class="nav-section-label">Account</div>
+
+        <button class="nav-item" onclick="logout()">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Logout
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <div class="avatar" id="sidebarAvatar">—</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebarName">Loading…</div>
+            <div class="user-role" id="sidebarRole">—</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ─── MAIN ────────────────────────────────────── -->
+    <div class="main">
+      <!-- TOP NAV -->
+      <header class="topnav">
+        <div class="topnav-left">
+          <button
+            class="menu-toggle"
+            onclick="toggleSidebar()"
+            aria-label="Toggle menu"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <div class="breadcrumb">
+            DermScan &nbsp;/&nbsp; <span>Dashboard</span>
+          </div>
+        </div>
+        <div class="topnav-right">
+          <button class="btn btn-primary" onclick="goHome()">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            New Analysis
+          </button>
+          <button class="btn btn-ghost" onclick="logout()">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <main class="content">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner animate-in delay-1">
+          <div class="welcome-text">
+            <div class="welcome-eyebrow">AI-Powered Dermatology</div>
+            <h1 class="welcome-heading" id="welcomeText">Welcome back</h1>
+            <p class="welcome-sub">
+              Your skin health analysis platform. Review your prediction history
+              and start new scans below.
+            </p>
+          </div>
+          <div class="welcome-cta">
+            <button class="btn btn-white" onclick="goHome()">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Start New Analysis
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+          <!-- Total Predictions -->
+          <div class="stat-card animate-in delay-1">
+            <div class="stat-header">
+              <div class="stat-label">Total Predictions</div>
+              <div class="stat-icon icon-teal">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value" id="totalPredictions">—</div>
+            <div class="stat-footer">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                width="14"
+                height="14"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+              All-time scans
+            </div>
+          </div>
+
+          <!-- Most Recent Finding -->
+          <div class="stat-card animate-in delay-2">
+            <div class="stat-header">
+              <div class="stat-label">Most Recent Finding</div>
+              <div class="stat-icon icon-amber">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value small" id="recentDisease">—</div>
+            <div class="stat-footer">Latest diagnosis</div>
+          </div>
+
+          <!-- User Role -->
+          <div class="stat-card animate-in delay-3">
+            <div class="stat-header">
+              <div class="stat-label">User Role</div>
+              <div class="stat-icon icon-slate">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value small" id="userRole">—</div>
+            <div class="stat-footer">Access level</div>
+          </div>
+        </div>
+        <!-- /stats -->
+
+        <!-- History Section -->
+        <div class="section animate-in delay-4">
+          <div class="section-head">
+            <div>
+              <div class="section-title">
+                Prediction History
+                <span
+                  class="count-badge"
+                  id="countBadge"
+                  style="display: none"
+                ></span>
+              </div>
+              <div class="section-sub">
+                Previous skin disease analyses and AI results
+              </div>
+            </div>
+          </div>
+
+          <div class="history-body">
+            <div class="grid" id="historyGrid">
+              <!-- Skeleton placeholders shown while data loads -->
+              <div class="card" style="opacity: 0.5">
+                <div class="img-wrap skeleton" style="height: 200px"></div>
+                <div class="card-body" style="gap: 10px">
+                  <div class="skeleton" style="height: 22px; width: 80px"></div>
+                  <div class="skeleton" style="height: 26px; width: 70%"></div>
+                  <div class="skeleton" style="height: 8px"></div>
+                </div>
+              </div>
+              <div class="card" style="opacity: 0.35">
+                <div class="img-wrap skeleton" style="height: 200px"></div>
+                <div class="card-body" style="gap: 10px">
+                  <div class="skeleton" style="height: 22px; width: 80px"></div>
+                  <div class="skeleton" style="height: 26px; width: 70%"></div>
+                  <div class="skeleton" style="height: 8px"></div>
+                </div>
+              </div>
+              <div class="card" style="opacity: 0.2">
+                <div class="img-wrap skeleton" style="height: 200px"></div>
+                <div class="card-body" style="gap: 10px">
+                  <div class="skeleton" style="height: 22px; width: 80px"></div>
+                  <div class="skeleton" style="height: 26px; width: 70%"></div>
+                  <div class="skeleton" style="height: 8px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /history section -->
+      </main>
+    </div>
+    <!-- /main -->
+
+    <!-- Dashboard Script -->
+    <script src="../static/js/dashboard.js"></script>
+
+    <!-- ANALYSIS MODAL -->
+
+    <div class="analysis-modal" id="analysisModal">
+      <div class="analysis-box">
+        <button class="close-analysis" onclick="closeAnalysis()">✕</button>
+
+        <div class="analysis-head">
+          <div class="welcome-eyebrow">AI ANALYSIS</div>
+
+          <h2 class="analysis-title">New Skin Analysis</h2>
+
+          <p class="analysis-sub">
+            Upload a skin image for AI-powered dermatology prediction
+          </p>
+        </div>
+
+        <!-- Upload -->
+
+        <div class="upload-zone" id="analysisDropZone">
+          <input type="file" id="analysisInput" hidden accept="image/*" />
+
+          <div class="upload-icon-big">⬆</div>
+
+          <h3>Upload Skin Image</h3>
+
+          <p>Drag & drop or click to browse</p>
+        </div>
+
+        <!-- Preview -->
+
+        <div class="analysis-preview" id="analysisPreview">
+          <img id="analysisImg" />
+        </div>
+
+        <!-- Run -->
+
+        <button class="btn btn-primary run-btn" onclick="runAnalysis()">
+          Run AI Analysis
+        </button>
+
+        <!-- Results -->
+
+        <div class="analysis-results">
+          <div class="analysis-card">
+            <span>Stage 1 Category</span>
+
+            <h3 id="stage1Result">-</h3>
+          </div>
+
+          <div class="analysis-card">
+            <span>Final Disease</span>
+
+            <h3 id="stage2Result">-</h3>
+          </div>
+        </div>
+        <div id="gradcamSection" style="display: none; margin-top: 28px">
+          <h3 style="margin-bottom: 14px; font-size: 18px; font-weight: 700">
+            AI Attention Heatmap
+          </h3>
+
+          <img
+            id="gradcamImg"
+            style="
+              width: 100%;
+              border-radius: 22px;
+              border: 1px solid rgba(255, 255, 255, 0.08);
+            "
+          />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
