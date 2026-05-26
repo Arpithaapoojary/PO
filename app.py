@@ -17,9 +17,14 @@ import tensorflow as tf
 import cv2
 import matplotlib.cm as cm
 
-
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Image
+)
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -66,10 +71,21 @@ def init_db():
         stage1_conf  REAL,
         stage2_label TEXT,
         stage2_conf  REAL,
+        review_status TEXT DEFAULT 'Pending',
         created_at   TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (patient_id) REFERENCES users(id)
     )''')
+    # ADD GRADCAM COLUMN IF MISSING
 
+    try:
+
+        c.execute(
+            "ALTER TABLE predictions ADD COLUMN gradcam_path TEXT"
+        )
+
+    except:
+
+        pass
     c.execute('''CREATE TABLE IF NOT EXISTS doctor_notes (
         id            INTEGER PRIMARY KEY AUTOINCREMENT,
         doctor_id     INTEGER NOT NULL,
@@ -138,10 +154,102 @@ except Exception as e:
     print(f"ERROR: {load_error}")
 
 
-
-
-
 def generate_gradcam(model, img_array):
+
+    base_model = model.layers[1]
+
+    grad_model = tf.keras.models.Model(
+        [
+            base_model.inputs
+        ],
+        [
+            base_model.get_layer("Conv_1").output,
+            base_model.output
+        ]
+    )
+
+    with tf.GradientTape() as tape:
+
+        conv_outputs, predictions = grad_model(img_array)
+
+        loss = predictions[:, 0]
+
+    grads = tape.gradient(
+        loss,
+        conv_outputs
+    )
+
+    pooled_grads = tf.reduce_mean(
+        grads,
+        axis=(0,1,2)
+    )
+
+    conv_outputs = conv_outputs[0]
+
+    heatmap = tf.reduce_sum(
+        pooled_grads * conv_outputs,
+        axis=-1
+    )
+
+    heatmap = np.maximum(
+        heatmap,
+        0
+    )
+
+    heatmap /= (
+        np.max(heatmap) + 1e-8
+    )
+
+    return heatmap
+
+
+
+
+    base_model = model.layers[1]
+
+    grad_model = tf.keras.models.Model(
+        [
+            base_model.inputs
+        ],
+        [
+            base_model.get_layer("Conv_1").output,
+            base_model.output
+        ]
+    )
+
+    with tf.GradientTape() as tape:
+
+        conv_outputs, predictions = grad_model(img_array)
+
+        loss = predictions[:, 0]
+
+    grads = tape.gradient(
+        loss,
+        conv_outputs
+    )
+
+    pooled_grads = tf.reduce_mean(
+        grads,
+        axis=(0,1,2)
+    )
+
+    conv_outputs = conv_outputs[0]
+
+    heatmap = tf.reduce_sum(
+        pooled_grads * conv_outputs,
+        axis=-1
+    )
+
+    heatmap = np.maximum(
+        heatmap,
+        0
+    )
+
+    heatmap /= (
+        np.max(heatmap) + 1e-8
+    )
+
+    return heatmap
 
     # Get MobileNetV2 base model
     base_model = model.layers[1]
@@ -339,32 +447,66 @@ def register():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    d        = request.get_json()
-    email    = d.get('email', '').strip().lower()
+
+    d = request.get_json()
+
+    email = d.get('email', '').strip().lower()
+
     password = d.get('password', '')
 
     conn = sqlite3.connect(DB_PATH)
+
     conn.row_factory = sqlite3.Row
-    user = conn.execute('SELECT * FROM users WHERE email=?', (email,)).fetchone()
+
+    user = conn.execute(
+        'SELECT * FROM users WHERE email=?',
+        (email,)
+    ).fetchone()
+
     conn.close()
 
-    if not user or not bcrypt.check_password_hash(user['password'], password):
-        return jsonify({'error': 'Invalid email or password.'}), 401
+    if not user or not bcrypt.check_password_hash(
+        user['password'],
+        password
+    ):
 
-    session['user_id']   = user['id']
+        return jsonify({
+            'error': 'Invalid email or password.'
+        }), 401
+
+    session['user_id'] = user['id']
+
     session['user_name'] = user['name']
+
     session['user_role'] = user['role']
 
+    # ROLE BASED REDIRECT
+
+    if user['role'] == 'doctor':
+
+        redirect_url = '/doctor'
+
+    else:
+
+        redirect_url = '/dashboard'
+
     return jsonify({
+
         'message': 'Login successful.',
+
+        'redirect': redirect_url,
+
         'user': {
-            'id':   user['id'],
+
+            'id': user['id'],
+
             'name': user['name'],
+
             'role': user['role'],
-            'email': user['email'],
+
+            'email': user['email']
         }
     })
-
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
@@ -403,30 +545,61 @@ def predict_class(model, tensor, labels):
     all_conf = [round(float(p)*100,1) for p in (preds[0] if preds.shape[-1]>1 else [1-float(preds[0][0]), float(preds[0][0])])]
     return labels[idx], round(conf*100, 2), all_conf
 
-
 @app.route('/api/predict', methods=['POST'])
 def predict():
+
     if 'user_id' not in session:
-        return jsonify({'error': 'Please login first.'}), 401
+        return jsonify({
+            'error': 'Please login first.'
+        }), 401
+
     if stage1_model is None:
-        return jsonify({'error': load_error}), 500
+        return jsonify({
+            'error': load_error
+        }), 500
+
     if 'image' not in request.files:
-        return jsonify({'error': 'No image uploaded.'}), 400
+        return jsonify({
+            'error': 'No image uploaded.'
+        }), 400
 
     try:
-        img_bytes = request.files['image'].read()
-        tensor    = preprocess(img_bytes)
 
-        s1_raw, s1_conf, s1_all = predict_class(stage1_model, tensor, CLASS_LABELS_STAGE1)
+        img_bytes = request.files['image'].read()
+
+        tensor = preprocess(img_bytes)
+
+        # STAGE 1
+
+        s1_raw, s1_conf, s1_all = predict_class(
+            stage1_model,
+            tensor,
+            CLASS_LABELS_STAGE1
+        )
+
+        # STAGE 2
+
         if s1_raw == 'allergy':
-            s2_raw, s2_conf, s2_all = predict_class(allergy_model,   tensor, CLASS_LABELS_ALLERGY)
+
+            s2_raw, s2_conf, s2_all = predict_class(
+                allergy_model,
+                tensor,
+                CLASS_LABELS_ALLERGY
+            )
+
             s2_labels = CLASS_LABELS_ALLERGY
+
         else:
-            s2_raw, s2_conf, s2_all = predict_class(infection_model, tensor, CLASS_LABELS_INFECTION)
+
+            s2_raw, s2_conf, s2_all = predict_class(
+                infection_model,
+                tensor,
+                CLASS_LABELS_INFECTION
+            )
+
             s2_labels = CLASS_LABELS_INFECTION
 
-        # Save image
-                # ─────────────────────────────
+        # ─────────────────────────────
         # GENERATE GRAD-CAM
         # ─────────────────────────────
 
@@ -435,29 +608,25 @@ def predict():
             tensor
         )
 
-        # Convert original image
         original_img = Image.open(
             io.BytesIO(img_bytes)
         ).convert("RGB")
 
-        original_img = original_img.resize((224, 224))
+        original_img = original_img.resize((224,224))
 
         original_np = np.array(original_img)
 
-        # Resize heatmap
         heatmap = cv2.resize(
             heatmap,
-            (224, 224)
+            (224,224)
         )
 
-        # Convert heatmap colors
         heatmap = np.uint8(255 * heatmap)
 
-        heatmap = cm.jet(heatmap)[:, :, :3]
+        heatmap = cm.jet(heatmap)[:,:,:3]
 
         heatmap = np.uint8(heatmap * 255)
 
-        # Overlay heatmap
         superimposed_img = cv2.addWeighted(
             original_np,
             0.6,
@@ -466,8 +635,10 @@ def predict():
             0
         )
 
-        # Save Grad-CAM image
-        gradcam_name = f"gradcam_{datetime.now().strftime('%Y%m%d%H%M%S')}.jpg"
+        gradcam_name = (
+            f"gradcam_"
+            f"{datetime.now().strftime('%Y%m%d%H%M%S')}.jpg"
+        )
 
         gradcam_path = os.path.join(
             GRADCAM_DIR,
@@ -478,49 +649,103 @@ def predict():
             superimposed_img
         ).save(gradcam_path)
 
-        fname = f"{session['user_id']}_{datetime.now().strftime('%Y%m%d%H%M%S')}.jpg"
-        fpath = os.path.join(IMG_DIR, fname)
-        Image.open(io.BytesIO(img_bytes)).convert('RGB').save(fpath)
+        # SAVE ORIGINAL IMAGE
 
-        # Save to DB
-        conn = sqlite3.connect(DB_PATH)
-        cur  = conn.execute(
-            'INSERT INTO predictions (patient_id,image_path,stage1_label,stage1_conf,stage2_label,stage2_conf) VALUES (?,?,?,?,?,?)',
-            (session['user_id'], fname, s1_raw, s1_conf, s2_raw, s2_conf)
+        fname = (
+            f"{session['user_id']}_"
+            f"{datetime.now().strftime('%Y%m%d%H%M%S')}.jpg"
         )
+
+        fpath = os.path.join(
+            IMG_DIR,
+            fname
+        )
+
+        Image.open(
+            io.BytesIO(img_bytes)
+        ).convert("RGB").save(fpath)
+
+        # SAVE DATABASE
+
+        conn = sqlite3.connect(DB_PATH)
+
+        cur = conn.execute(
+            '''
+            INSERT INTO predictions
+            (
+                patient_id,
+                image_path,
+                gradcam_path,
+                stage1_label,
+                stage1_conf,
+                stage2_label,
+                stage2_conf
+            )
+            VALUES (?,?,?,?,?,?,?)
+            ''',
+            (
+                session['user_id'],
+                fname,
+                gradcam_name,
+                s1_raw,
+                s1_conf,
+                s2_raw,
+                s2_conf
+            )
+        )
+
         pred_id = cur.lastrowid
+
         conn.commit()
+
         conn.close()
+
         return jsonify({
 
             'prediction_id': pred_id,
 
-    'stage1': {
-        'label': DISPLAY_STAGE1.get(s1_raw, s1_raw),
-        'raw': s1_raw,
-        'confidence': s1_conf,
-        'all_conf': s1_all,
-        'all_labels': [
-            DISPLAY_STAGE1.get(l,l)
-            for l in CLASS_LABELS_STAGE1
-        ]
-    },
+            'stage1': {
 
-    'stage2': {
-        'label': DISPLAY_STAGE2.get(s2_raw, s2_raw),
-        'raw': s2_raw,
-        'confidence': s2_conf,
-        'all_conf': s2_all,
-        'all_labels': [
-            DISPLAY_STAGE2.get(l,l)
-            for l in s2_labels
-        ]
-    },
+                'label': DISPLAY_STAGE1.get(
+                    s1_raw,
+                    s1_raw
+                ),
 
-    'gradcam_image':
-        f'/uploads/gradcam/{gradcam_name}'
+                'raw': s1_raw,
 
-})
+                'confidence': s1_conf,
+
+                'all_conf': s1_all,
+
+                'all_labels': [
+                    DISPLAY_STAGE1.get(l,l)
+                    for l in CLASS_LABELS_STAGE1
+                ]
+            },
+
+            'stage2': {
+
+                'label': DISPLAY_STAGE2.get(
+                    s2_raw,
+                    s2_raw
+                ),
+
+                'raw': s2_raw,
+
+                'confidence': s2_conf,
+
+                'all_conf': s2_all,
+
+                'all_labels': [
+                    DISPLAY_STAGE2.get(l,l)
+                    for l in s2_labels
+                ]
+            },
+
+            'gradcam_image':
+                f'/uploads/gradcam/{gradcam_name}'
+        })
+
     except Exception as e:
 
         import traceback
@@ -528,23 +753,43 @@ def predict():
         traceback.print_exc()
 
         return jsonify({
-        'error': str(e)
+            'error': str(e)
         }), 500
+@app.route('/api/report', methods=['POST'])
 @app.route('/api/report', methods=['POST'])
 def generate_report():
 
     if 'user_id' not in session:
-        return jsonify({'error': 'Please login first.'}), 401
+
+        return jsonify({
+            'error': 'Please login first.'
+        }), 401
 
     try:
 
         data = request.get_json()
 
         patient = data.get('patient', {})
+
         stage1 = data.get('stage1', {})
+
         stage2 = data.get('stage2', {})
 
-        temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        original_image = data.get('original_image')
+
+        gradcam_image = data.get('gradcam_image')
+
+        doctor_note = data.get('doctor_note', '')
+
+        review_status = data.get(
+            'review_status',
+            'Pending'
+        )
+
+        temp_pdf = tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix='.pdf'
+        )
 
         doc = SimpleDocTemplate(
             temp_pdf.name,
@@ -560,9 +805,11 @@ def generate_report():
         story = []
 
         # TITLE
+
         story.append(
+
             Paragraph(
-                "<font size=22><b>DermScan AI Medical Report</b></font>",
+                "<font size=22><b>DermScan AI Clinical Report</b></font>",
                 styles['Title']
             )
         )
@@ -570,7 +817,9 @@ def generate_report():
         story.append(Spacer(1, 20))
 
         # PATIENT DETAILS
+
         story.append(
+
             Paragraph(
                 "<b>Patient Information</b>",
                 styles['Heading2']
@@ -586,12 +835,100 @@ def generate_report():
         '''
 
         story.append(
-            Paragraph(patient_html, styles['BodyText'])
+            Paragraph(
+                patient_html,
+                styles['BodyText']
+            )
         )
 
-        story.append(Spacer(1, 18))
+        story.append(Spacer(1, 20))
 
-        # RESULTS
+        # ORIGINAL IMAGE
+
+        if original_image:
+
+            try:
+
+                original_bytes = base64.b64decode(
+                    original_image.split(',')[1]
+                )
+
+                original_temp = tempfile.NamedTemporaryFile(
+                    delete=False,
+                    suffix='.jpg'
+                )
+
+                original_temp.write(original_bytes)
+
+                original_temp.close()
+
+                story.append(
+                    Paragraph(
+                        "<b>Original Skin Image</b>",
+                        styles['Heading2']
+                    )
+                )
+
+                story.append(Spacer(1, 10))
+
+                story.append(
+                    Image(
+                        original_temp.name,
+                        width=250,
+                        height=250
+                    )
+                )
+
+                story.append(Spacer(1, 20))
+
+            except:
+
+                pass
+
+        # GRADCAM IMAGE
+
+        if gradcam_image:
+
+            try:
+
+                gradcam_bytes = base64.b64decode(
+                    gradcam_image.split(',')[1]
+                )
+
+                gradcam_temp = tempfile.NamedTemporaryFile(
+                    delete=False,
+                    suffix='.jpg'
+                )
+
+                gradcam_temp.write(gradcam_bytes)
+
+                gradcam_temp.close()
+
+                story.append(
+                    Paragraph(
+                        "<b>AI Attention Heatmap (Grad-CAM)</b>",
+                        styles['Heading2']
+                    )
+                )
+
+                story.append(Spacer(1, 10))
+
+                story.append(
+                    Image(
+                        gradcam_temp.name,
+                        width=250,
+                        height=250
+                    )
+                )
+
+                story.append(Spacer(1, 20))
+
+            except:
+
+                pass
+
+        # AI RESULTS
+
         story.append(
             Paragraph(
                 "<b>AI Prediction Results</b>",
@@ -601,52 +938,113 @@ def generate_report():
 
         result_html = f'''
         <br/>
-        <b>Stage 1 Category:</b> {stage1.get("raw", "N/A")}<br/>
-        <b>Stage 1 Confidence:</b> {stage1.get("confidence", "N/A")}%<br/><br/>
 
-        <b>Detected Disease:</b> {stage2.get("raw", "N/A")}<br/>
-        <b>Disease Confidence:</b> {stage2.get("confidence", "N/A")}%<br/>
+        <b>Stage 1 Category:</b>
+        {stage1.get("raw", "N/A")}<br/>
+
+        <b>Stage 1 Confidence:</b>
+        {stage1.get("confidence", "N/A")}%<br/><br/>
+
+        <b>Detected Disease:</b>
+        {stage2.get("raw", "N/A")}<br/>
+
+        <b>Disease Confidence:</b>
+        {stage2.get("confidence", "N/A")}%<br/>
         '''
 
         story.append(
-            Paragraph(result_html, styles['BodyText'])
+            Paragraph(
+                result_html,
+                styles['BodyText']
+            )
+        )
+
+        story.append(Spacer(1, 20))
+
+        # DOCTOR REVIEW
+
+        story.append(
+            Paragraph(
+                "<b>Clinical Review</b>",
+                styles['Heading2']
+            )
+        )
+
+        doctor_html = f'''
+        <br/>
+
+        <b>Review Status:</b>
+        {review_status}<br/><br/>
+
+        <b>Doctor Notes:</b><br/>
+
+        {
+            doctor_note
+            if doctor_note
+            else "Awaiting doctor review."
+        }
+        '''
+
+        story.append(
+            Paragraph(
+                doctor_html,
+                styles['BodyText']
+            )
         )
 
         story.append(Spacer(1, 20))
 
         # DISCLAIMER
+
         disclaimer = """
         <font size=10>
-        <b>Disclaimer:</b><br/>
-        This report is generated using an AI-based skin disease detection system
-        for educational and research purposes only.
-        It should not be considered as a final medical diagnosis.
-        Please consult a qualified dermatologist for professional evaluation.
+
+        <b>Disclaimer:</b><br/><br/>
+
+        This report is generated using an AI-assisted
+        skin disease classification system for
+        educational and research purposes only.
+
+        The generated predictions should not be treated
+        as a final medical diagnosis.
+
+        Please consult a qualified dermatologist for
+        professional clinical evaluation.
+
         </font>
         """
 
         story.append(
-            Paragraph(disclaimer, styles['BodyText'])
+            Paragraph(
+                disclaimer,
+                styles['BodyText']
+            )
         )
 
         story.append(Spacer(1, 20))
 
         # FOOTER
+
         story.append(
             Paragraph(
-                "<font size=10><i>Generated by DermScan AI</i></font>",
+                "<font size=10><i>Generated by DermScan AI Platform</i></font>",
                 styles['Italic']
             )
         )
 
         # BUILD PDF
+
         doc.build(story)
 
-        # CONVERT TO BASE64
+        # READ PDF
+
         with open(temp_pdf.name, 'rb') as f:
+
             pdf_data = f.read()
 
-        encoded = base64.b64encode(pdf_data).decode('utf-8')
+        encoded = base64.b64encode(
+            pdf_data
+        ).decode('utf-8')
 
         return jsonify({
             'pdf': encoded
@@ -654,36 +1052,140 @@ def generate_report():
 
     except Exception as e:
 
+        import traceback
+
+        traceback.print_exc()
+
         return jsonify({
             'error': str(e)
         }), 500
 # ─────────────────────────────────────────
 # HISTORY (patient sees own, doctor sees all)
 # ─────────────────────────────────────────
+@app.route('/api/add-note', methods=['POST'])
+def add_note():
+
+    if 'user_id' not in session:
+        return jsonify({
+            'error': 'Please login first.'
+        }), 401
+
+    if session['user_role'] != 'doctor':
+        return jsonify({
+            'error': 'Only doctors can add notes.'
+        }), 403
+
+    data = request.get_json()
+
+    prediction_id = data.get('prediction_id')
+    note = data.get('note', '').strip()
+    status = data.get('status', 'Approved')
+
+    if not prediction_id or not note:
+        return jsonify({
+            'error': 'Missing fields.'
+        }), 400
+
+    conn = sqlite3.connect(DB_PATH)
+
+    conn.execute(
+        '''
+        INSERT INTO doctor_notes
+        (doctor_id, prediction_id, note)
+        VALUES (?, ?, ?)
+        ''',
+        (
+            session['user_id'],
+            prediction_id,
+            note
+        )
+    )
+
+    conn.execute(
+        '''
+        UPDATE predictions
+        SET review_status=?
+        WHERE id=?
+        ''',
+        (
+            status,
+            prediction_id
+        )
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        'message': 'Doctor review saved.'
+    })
+
 
 @app.route('/api/history', methods=['GET'])
 def history():
+
     if 'user_id' not in session:
-        return jsonify({'error': 'Not logged in.'}), 401
+
+        return jsonify({
+            'error': 'Not logged in.'
+        }), 401
 
     conn = sqlite3.connect(DB_PATH)
+
     conn.row_factory = sqlite3.Row
 
+    # PATIENT HISTORY
+
     if session['user_role'] == 'patient':
-        rows = conn.execute(
-            'SELECT * FROM predictions WHERE patient_id=? ORDER BY created_at DESC',
-            (session['user_id'],)
-        ).fetchall()
-    else:
+
         rows = conn.execute('''
-            SELECT p.*, u.name as patient_name
+
+            SELECT
+                p.*,
+                dn.note as doctor_note
+
             FROM predictions p
-            JOIN users u ON u.id = p.patient_id
+
+            LEFT JOIN doctor_notes dn
+            ON dn.prediction_id = p.id
+
+            WHERE p.patient_id=?
+
             ORDER BY p.created_at DESC
+
+        ''',
+        (session['user_id'],)
+        ).fetchall()
+
+    # DOCTOR HISTORY
+
+    else:
+
+        rows = conn.execute('''
+
+            SELECT
+                p.*,
+                u.name as patient_name,
+                dn.note as doctor_note
+
+            FROM predictions p
+
+            JOIN users u
+            ON u.id = p.patient_id
+
+            LEFT JOIN doctor_notes dn
+            ON dn.prediction_id = p.id
+
+            ORDER BY p.created_at DESC
+
         ''').fetchall()
 
     conn.close()
-    return jsonify([dict(r) for r in rows])
+
+    return jsonify([
+        dict(r)
+        for r in rows
+    ])
 
 
 # ─────────────────────────────────────────
@@ -696,7 +1198,36 @@ def index():
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+
+    if 'user_id' not in session:
+
+        return render_template('login.html')
+
+    if session['user_role'] != 'patient':
+
+        return render_template(
+            'doctor_dashboard.html'
+        )
+
+    return render_template(
+        'dashboard.html'
+    )
+@app.route('/doctor')
+def doctor_dashboard():
+
+    if 'user_id' not in session:
+
+        return render_template('login.html')
+
+    if session['user_role'] != 'doctor':
+
+        return render_template(
+            'dashboard.html'
+        )
+
+    return render_template(
+        'doctor_dashboard.html'
+    )
 
 @app.route('/login')
 def login_page():

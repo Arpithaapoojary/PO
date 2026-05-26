@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Doctor Dashboard</title>
+
+    <link rel="stylesheet" href="../static/css/dashboard.css" />
+  </head>
+
+  <body>
+    <div class="main">
+      <header class="topnav">
+        <div class="topnav-left">
+          <div class="breadcrumb">DermScan / Doctor Panel</div>
+        </div>
+
+        <div class="topnav-right">
+          <button class="btn btn-ghost" onclick="logout()">Logout</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- HEADER -->
+
+        <div class="welcome-banner">
+          <div class="welcome-text">
+            <div class="welcome-eyebrow">CLINICAL REVIEW SYSTEM</div>
+
+            <h1 class="welcome-heading">Doctor Dashboard</h1>
+
+            <p class="welcome-sub">Review AI predictions and validate cases.</p>
+          </div>
+        </div>
+
+        <!-- STATS -->
+
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-label">Pending Reviews</div>
+
+            <div class="stat-value" id="pendingCount">—</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Total Cases</div>
+
+            <div class="stat-value" id="totalCases">—</div>
+          </div>
+        </div>
+
+        <!-- CASES -->
+
+        <div class="section">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Patient Cases</div>
+
+              <div class="section-sub">
+                AI generated dermatology predictions
+              </div>
+            </div>
+          </div>
+
+          <div class="grid" id="doctorGrid"></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- REVIEW MODAL -->
+
+    <div class="analysis-modal" id="reviewModal">
+      <div class="analysis-box">
+        <button class="close-analysis" onclick="closeReview()">✕</button>
+
+        <div class="analysis-head">
+          <div class="welcome-eyebrow">DOCTOR REVIEW</div>
+
+          <h2 class="analysis-title">Clinical Validation</h2>
+        </div>
+
+        <img id="reviewImage" class="review-modal-image" />
+
+        <div class="gradcam-box">
+          <h3>AI Attention Heatmap</h3>
+
+          <img id="reviewGradcam" />
+        </div>
+
+        <div class="review-grid">
+          <div class="review-box">
+            <span>Prediction</span>
+
+            <h3 id="reviewDisease">-</h3>
+          </div>
+
+          <div class="review-box">
+            <span>Confidence</span>
+
+            <h3 id="reviewConfidence">-</h3>
+          </div>
+        </div>
+
+        <textarea
+          id="doctorNote"
+          class="review-textarea"
+          placeholder="Write doctor review..."
+        ></textarea>
+
+        <div class="review-actions">
+          <button class="btn btn-primary" onclick="submitReview('Approved')">
+            Approve
+          </button>
+
+          <button class="btn btn-ghost" onclick="submitReview('Rejected')">
+            Reject
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../static/js/doctor.js"></script>
+  </body>
+</html>

@@ -1027,3 +1027,170 @@ body {
   margin-top: 10px;
   font-size: 24px;
 }
+/* ─────────────────────────────────────────
+   REVIEW STATUS
+───────────────────────────────────────── */
+
+.review-status {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.review-approved {
+  background: rgba(21, 165, 137, 0.12);
+  color: var(--teal-700);
+}
+
+.review-pending {
+  background: rgba(245, 158, 11, 0.14);
+  color: #92400e;
+}
+
+.review-rejected {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--red-500);
+}
+
+/* ─────────────────────────────────────────
+   DOCTOR NOTE
+───────────────────────────────────────── */
+
+.doctor-note {
+  margin-top: 16px;
+  background: white;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--teal-500);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.doctor-note-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--teal-700);
+  margin-bottom: 8px;
+}
+
+.doctor-note-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+/* ─────────────────────────────────────────
+   REVIEW MODAL
+───────────────────────────────────────── */
+
+.review-modal-image {
+  width: 100%;
+  border-radius: 22px;
+  margin-top: 22px;
+  max-height: 340px;
+  object-fit: cover;
+}
+
+.review-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.review-box {
+  background: var(--slate-50);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px;
+}
+
+.review-box span {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.review-box h3 {
+  margin-top: 10px;
+  font-size: 22px;
+}
+
+.review-textarea {
+  width: 100%;
+  min-height: 140px;
+  margin-top: 24px;
+  border-radius: 20px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  resize: none;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.review-textarea:focus {
+  border-color: var(--teal-500);
+  box-shadow: 0 0 0 4px rgba(21, 165, 137, 0.08);
+}
+
+.review-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+/* ─────────────────────────────────────────
+   GRADCAM IMAGE
+───────────────────────────────────────── */
+
+.gradcam-box {
+  margin-top: 26px;
+}
+
+.gradcam-box h3 {
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+.gradcam-box img {
+  width: 100%;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+}
+
+/* ─────────────────────────────────────────
+   PATIENT CASE LABEL
+───────────────────────────────────────── */
+
+.patient-chip {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--slate-100);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE REVIEW MODAL
+───────────────────────────────────────── */
+
+@media (max-width: 700px) {
+  .review-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .review-actions {
+    flex-direction: column;
+  }
+}

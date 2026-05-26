@@ -1,37 +1,58 @@
-/* ─── Sidebar toggle (mobile) ─────────────────── */
+/* ─────────────────────────────────────────
+   MOBILE SIDEBAR
+───────────────────────────────────────── */
 
 function toggleSidebar() {
   document.getElementById("sidebar").classList.toggle("open");
+
   document.getElementById("sidebarOverlay").classList.toggle("open");
 }
 
 function closeSidebar() {
   document.getElementById("sidebar").classList.remove("open");
+
   document.getElementById("sidebarOverlay").classList.remove("open");
 }
 
-/* ─── Load user ───────────────────────────────── */
+/* ─────────────────────────────────────────
+   GLOBALS
+───────────────────────────────────────── */
+
+let selectedFile = null;
+
+/* ─────────────────────────────────────────
+   LOAD USER
+───────────────────────────────────────── */
 
 async function loadUser() {
   try {
-    const res = await fetch("/api/me", { credentials: "include" });
+    const res = await fetch("/api/me", {
+      credentials: "include",
+    });
+
     const data = await res.json();
 
     if (!res.ok || data.error) {
       window.location.href = "/login";
+
       return;
     }
 
-    // Topbar welcome
+    // ONLY PATIENTS HERE
+
+    if (data.role !== "patient") {
+      window.location.href = "/doctor";
+
+      return;
+    }
+
     document.getElementById("welcomeText").textContent =
       `Welcome back, ${data.name}`;
 
-    // Stat card
-    document.getElementById("userRole").textContent = data.role;
-
-    // Sidebar
     document.getElementById("sidebarName").textContent = data.name;
-    document.getElementById("sidebarRole").textContent = data.role;
+
+    document.getElementById("sidebarRole").textContent = "Patient";
+
     document.getElementById("sidebarAvatar").textContent = data.name
       ? data.name.charAt(0).toUpperCase()
       : "?";
@@ -40,14 +61,23 @@ async function loadUser() {
   }
 }
 
-/* ─── Load history ────────────────────────────── */
+/* ─────────────────────────────────────────
+   LOAD HISTORY
+───────────────────────────────────────── */
 
 async function loadHistory() {
   try {
-    const res = await fetch("/api/history", { credentials: "include" });
+    const res = await fetch("/api/history", {
+      credentials: "include",
+    });
+
     const data = await res.json();
 
-    if (!Array.isArray(data)) throw new Error("Could not load history");
+    if (!Array.isArray(data)) {
+      throw new Error("Invalid history");
+    }
+
+    // STATS
 
     document.getElementById("totalPredictions").textContent = data.length;
 
@@ -58,95 +88,207 @@ async function loadHistory() {
 
     const grid = document.getElementById("historyGrid");
 
+    // EMPTY
+
     if (data.length === 0) {
       grid.innerHTML = `
-        <div class="empty" style="grid-column:1/-1">
-          <div class="empty-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-          </div>
-          <div class="empty-title">No predictions yet</div>
-          <div class="empty-sub">Start your first skin analysis to see results here.</div>
-          <button class="btn btn-primary" onclick="goHome()" style="margin-top:4px">
-            Begin Analysis
-          </button>
-        </div>`;
+
+        <div class="empty">
+
+          <h3>No analyses yet</h3>
+
+          <p>
+            Upload a skin image to begin AI analysis.
+          </p>
+
+        </div>
+      `;
+
       return;
     }
 
-    // Show count badge
-    const badge = document.getElementById("countBadge");
-    badge.textContent = data.length;
-    badge.style.display = "inline-flex";
-
     grid.innerHTML = "";
 
-    data.forEach((item, i) => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.style.animationDelay = `${i * 0.05}s`;
+    data.forEach((item) => {
+      const status = item.review_status || "Pending";
 
-      const dateStr = new Date(item.created_at).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
+      const dateStr = new Date(item.created_at).toLocaleDateString();
+
+      const card = document.createElement("div");
+
+      card.className = "card";
 
       card.innerHTML = `
+
         <div class="img-wrap">
-          <img src="/uploads/${item.image_path}" alt="Skin scan image" loading="lazy" />
-          <div class="img-overlay"></div>
+
+          <img
+            src="/uploads/${item.image_path}">
+
         </div>
+
         <div class="card-body">
+
           <div class="card-top">
-            <div class="badge">${item.stage1_label}</div>
-            <span class="card-id">#${item.id}</span>
+
+            <div class="badge">
+
+              ${item.stage1_label}
+
+            </div>
+
+            <span class="card-id">
+
+              #${item.id}
+
+            </span>
+
           </div>
-          <div class="disease">${item.stage2_label}</div>
+
+          <div class="disease">
+
+            ${item.stage2_label}
+
+          </div>
+
+          <!-- CONFIDENCE -->
+
           <div class="conf-section">
+
             <div class="conf-header">
-              <span class="conf-label">AI Confidence</span>
-              <span class="conf-value">${item.stage2_conf}%</span>
+
+              <span class="conf-label">
+
+                AI Confidence
+
+              </span>
+
+              <span class="conf-value">
+
+                ${item.stage2_conf}%
+
+              </span>
+
             </div>
+
             <div class="track">
-              <div class="fill" style="width:${item.stage2_conf}%"></div>
+
+              <div
+                class="fill"
+                style="
+                  width:${item.stage2_conf}%
+                ">
+
+              </div>
+
             </div>
+
           </div>
+
+          <!-- REVIEW STATUS -->
+
+          <div
+            class="
+              review-status
+              ${
+                status === "Approved"
+                  ? "review-approved"
+                  : status === "Rejected"
+                    ? "review-rejected"
+                    : "review-pending"
+              }
+            ">
+
+            ${status}
+
+          </div>
+
+          <!-- DOCTOR NOTE -->
+
+          ${
+            item.doctor_note
+              ? `
+            <div class="doctor-note">
+
+              <div class="doctor-note-label">
+
+                Doctor Review
+
+              </div>
+
+              <div class="doctor-note-text">
+
+                ${item.doctor_note}
+
+              </div>
+
+            </div>
+            `
+              : `
+            <div class="doctor-note">
+
+              <div class="doctor-note-label">
+
+                Review Status
+
+              </div>
+
+              <div class="doctor-note-text">
+
+                Awaiting doctor review.
+
+              </div>
+
+            </div>
+            `
+          }
+
+          <!-- FOOTER -->
+
           <div class="card-footer">
-            <div class="card-date">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
-              </svg>
-              ${dateStr}
-            </div>
-            <span style="font-size:11px;font-weight:600;color:var(--teal-700)">View Details</span>
+
+  <div class="card-date">
+
+    ${dateStr}
+
+  </div>
+
+  <button
+    class="btn btn-primary btn-sm"
+    onclick='downloadReport(${JSON.stringify(item)})'>
+
+    Download Report
+
+  </button>
+
+</div>
+
+            <span
+              style="
+                font-size:12px;
+                font-weight:600;
+                color:var(--teal-700);
+              ">
+
+              AI Analysis
+
+            </span>
+
           </div>
-        </div>`;
+
+        </div>
+      `;
 
       grid.appendChild(card);
     });
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 }
 
-/* ─── Auth actions ────────────────────────────── */
-
-async function logout() {
-  try {
-    await fetch("/api/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    window.location.href = "/login";
-  } catch (err) {
-    alert("Logout failed");
-  }
-}
+/* ─────────────────────────────────────────
+   ANALYSIS MODAL
+───────────────────────────────────────── */
 
 function goHome() {
   document.getElementById("analysisModal").classList.add("show");
@@ -154,29 +296,33 @@ function goHome() {
   initializeAnalysisUpload();
 }
 
-/* ─── Init ────────────────────────────────────── */
+function closeAnalysis() {
+  document.getElementById("analysisModal").classList.remove("show");
+}
 
-loadUser();
-loadHistory();
-let selectedFile = null;
+/* ─────────────────────────────────────────
+   IMAGE UPLOAD
+───────────────────────────────────────── */
 
 function initializeAnalysisUpload() {
-  const analysisInput = document.getElementById("analysisInput");
+  const input = document.getElementById("analysisInput");
 
-  const analysisDropZone = document.getElementById("analysisDropZone");
+  const zone = document.getElementById("analysisDropZone");
 
-  if (!analysisInput || !analysisDropZone) {
+  if (!input || !zone) {
     return;
   }
 
-  analysisDropZone.onclick = () => {
-    analysisInput.click();
+  zone.onclick = () => {
+    input.click();
   };
 
-  analysisInput.onchange = (e) => {
+  input.onchange = (e) => {
     const file = e.target.files[0];
 
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     selectedFile = file;
 
@@ -191,13 +337,14 @@ function initializeAnalysisUpload() {
     reader.readAsDataURL(file);
   };
 }
-function closeAnalysis() {
-  document.getElementById("analysisModal").classList.remove("show");
-}
+
+/* ─────────────────────────────────────────
+   RUN ANALYSIS
+───────────────────────────────────────── */
 
 async function runAnalysis() {
   if (!selectedFile) {
-    alert("Upload image first");
+    alert("Please upload image first");
 
     return;
   }
@@ -209,17 +356,27 @@ async function runAnalysis() {
   try {
     const res = await fetch("/api/predict", {
       method: "POST",
+
       body: fd,
+
       credentials: "include",
     });
 
     const data = await res.json();
 
+    if (data.error) {
+      alert(data.error);
+
+      return;
+    }
+
+    // RESULTS
+
     document.getElementById("stage1Result").textContent = data.stage1.label;
 
     document.getElementById("stage2Result").textContent = data.stage2.label;
 
-    /* SHOW GRADCAM */
+    // GRADCAM
 
     if (data.gradcam_image) {
       document.getElementById("gradcamImg").src = data.gradcam_image;
@@ -227,10 +384,145 @@ async function runAnalysis() {
       document.getElementById("gradcamSection").style.display = "block";
     }
 
-    loadHistory();
+    // REFRESH HISTORY
 
     loadHistory();
   } catch (err) {
+    console.log(err);
+
     alert("Prediction failed");
   }
 }
+/* ─────────────────────────────────────────
+   DOWNLOAD REPORT
+───────────────────────────────────────── */
+
+async function downloadReport(item) {
+  try {
+    // ORIGINAL IMAGE
+
+    const originalRes = await fetch(`/uploads/${item.image_path}`);
+
+    const originalBlob = await originalRes.blob();
+
+    const originalBase64 = await blobToBase64(originalBlob);
+
+    // GRADCAM IMAGE
+
+    let gradcamBase64 = null;
+
+    if (item.gradcam_path) {
+      const gradcamRes = await fetch(`/uploads/gradcam/${item.gradcam_path}`);
+
+      const gradcamBlob = await gradcamRes.blob();
+
+      gradcamBase64 = await blobToBase64(gradcamBlob);
+    }
+
+    // REQUEST PDF
+
+    const res = await fetch("/api/report", {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      credentials: "include",
+
+      body: JSON.stringify({
+        patient: {
+          name: document.getElementById("sidebarName").textContent,
+
+          age: "N/A",
+
+          gender: "N/A",
+
+          area: "Skin Region",
+        },
+
+        stage1: {
+          raw: item.stage1_label,
+
+          confidence: item.stage1_conf,
+        },
+
+        stage2: {
+          raw: item.stage2_label,
+
+          confidence: item.stage2_conf,
+        },
+
+        original_image: originalBase64,
+
+        gradcam_image: gradcamBase64,
+
+        doctor_note: item.doctor_note || "",
+
+        review_status: item.review_status || "Pending",
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      alert(data.error);
+
+      return;
+    }
+
+    // DOWNLOAD PDF
+
+    const link = document.createElement("a");
+
+    link.href = `data:application/pdf;base64,${data.pdf}`;
+
+    link.download = `DermScan_Report_${item.id}.pdf`;
+
+    link.click();
+  } catch (err) {
+    console.log(err);
+
+    alert("Failed to generate report");
+  }
+}
+
+/* ─────────────────────────────────────────
+   BLOB TO BASE64
+───────────────────────────────────────── */
+
+function blobToBase64(blob) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+
+    reader.onloadend = () => resolve(reader.result);
+
+    reader.readAsDataURL(blob);
+  });
+}
+
+/* ─────────────────────────────────────────
+   LOGOUT
+───────────────────────────────────────── */
+
+async function logout() {
+  try {
+    await fetch("/api/logout", {
+      method: "POST",
+
+      credentials: "include",
+    });
+
+    window.location.href = "/login";
+  } catch (err) {
+    alert("Logout failed");
+  }
+}
+
+/* ─────────────────────────────────────────
+   INIT
+───────────────────────────────────────── */
+
+loadUser();
+
+loadHistory();
