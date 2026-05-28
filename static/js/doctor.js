@@ -1,12 +1,12 @@
 /* ─────────────────────────────────────────
    GLOBALS
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 let currentPredictionId = null;
 
 /* ─────────────────────────────────────────
    LOAD CASES
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 async function loadCases() {
   try {
@@ -101,7 +101,7 @@ async function loadCases() {
 
 /* ─────────────────────────────────────────
    OPEN REVIEW
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 function openReview(item) {
   currentPredictionId = item.id;
@@ -121,7 +121,7 @@ function openReview(item) {
 
 /* ─────────────────────────────────────────
    CLOSE REVIEW
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 function closeReview() {
   document.getElementById("reviewModal").classList.remove("show");
@@ -129,7 +129,7 @@ function closeReview() {
 
 /* ─────────────────────────────────────────
    SUBMIT REVIEW
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 async function submitReview(status) {
   const note = document.getElementById("doctorNote").value;
@@ -179,7 +179,7 @@ async function submitReview(status) {
 
 /* ─────────────────────────────────────────
    LOGOUT
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 async function logout() {
   await fetch("/api/logout", {
@@ -193,6 +193,6 @@ async function logout() {
 
 /* ─────────────────────────────────────────
    INIT
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 loadCases();

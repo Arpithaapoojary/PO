@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DermScan AI</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <title>DermScan — Hierarchical Deep Learning Clinical Platform</title>
+    <!-- SEO & Metadata -->
+    <meta name="description" content="A state-of-the-art hierarchical deep learning framework for clinical-grade skin disease classification, explainable Grad-CAM activation, and specialist validation." />
+    <!-- Styled Core Sheet -->
+    <link rel="stylesheet" href="../static/css/style.css" />
   </head>
   <body>
+    <!-- HEADER BRAND BAR -->
     <header>
       <a href="#" class="logo">
         <div class="logo-mark">
@@ -22,315 +22,332 @@
         <span class="logo-name">DermScan</span>
       </a>
       <nav>
-        <a href="#diseases">Conditions</a>
-        <a href="/login" class="nav-cta btn">Login</a>
+        <a href="#pipeline">AI Architecture</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#diseases">Reference Library</a>
+        <a href="/login" class="nav-cta btn">Secure Portal Access</a>
       </nav>
     </header>
 
-    <!-- HERO -->
+    <!-- HERO PRODUCT ENTRY -->
     <div class="hero">
-      <p class="hero-eye">Deep Learning Dermatology</p>
+      <p class="hero-eye">Clinical Decision Support System</p>
       <h1 class="hero-title">
-        Intelligent Skin<br />Condition <em>Detection</em>
+        Hierarchical Deep Learning Framework for <span>Skin Pathology</span> & Clinical Validation
       </h1>
       <p class="hero-sub">
-        A two-stage deep learning pipeline that classifies skin conditions —
-        first identifying the category, then pinpointing the specific disease.
+        An enterprise-grade tele-dermatology pipeline leveraging a structured two-stage neural network classifier, Grad-CAM attention explainability, and integrated clinician-in-the-loop validation.
       </p>
       <div class="hero-btns">
-        <a href="/login" class="btn btn-dark">Start Analysis</a>
-        <a href="#diseases" class="btn btn-ghost">View Conditions</a>
+        <a href="/login" class="btn btn-dark">Access Secure Console</a>
+        <a href="#pipeline" class="btn btn-ghost">Explore AI Pipeline</a>
       </div>
       <div class="hero-stats">
         <div class="stat">
-          <div class="stat-val">2<span>+</span></div>
-          <div class="stat-lbl">Stages</div>
+          <div class="stat-val">2<span>Stage</span></div>
+          <div class="stat-lbl">CNN Classifier</div>
         </div>
         <div class="stat">
-          <div class="stat-val">6</div>
-          <div class="stat-lbl">Conditions</div>
+          <div class="stat-val">Grad<span>CAM</span></div>
+          <div class="stat-lbl">Explainable AI (XAI)</div>
         </div>
         <div class="stat">
-          <div class="stat-val">CNN</div>
-          <div class="stat-lbl">Architecture</div>
+          <div class="stat-val">Doctor</div>
+          <div class="stat-lbl">Audit Validation</div>
         </div>
         <div class="stat">
-          <div class="stat-val">224<span>px</span></div>
-          <div class="stat-lbl">Input Size</div>
+          <div class="stat-val">PDF</div>
+          <div class="stat-lbl">Clinical Reports</div>
         </div>
       </div>
     </div>
 
-    <!-- DETECT -->
-    <div id="detect">
-      <div class="det-wrap reveal">
-        <p class="sec-eye">AI Engine</p>
-        <h2 class="sec-title" style="color: var(--paper); margin-bottom: 36px">
-          Two-Stage Analysis
-        </h2>
+    <!-- HIERARCHICAL PIPELINE PIPELINE VISUALIZATION -->
+    <section class="sec" id="pipeline">
+      <div style="text-align: center; margin-bottom: 48px;">
+        <p class="hero-eye" style="margin: 0 auto 16px;">Core Methodology</p>
+        <h2 class="sec-title" style="margin-bottom: 12px;">Hierarchical Routing Network</h2>
+        <p class="hero-sub" style="margin: 0 auto; max-width: 640px;">
+          Rather than classifying diseases in a single step, the framework intelligently segments skin pathologies into categorical layers for high-precision diagnostic outputs.
+        </p>
+      </div>
 
-        <!-- Patient Info Form -->
-        <div class="patient-form">
-          <p class="form-title">Patient Information (optional)</p>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="pName">Full Name</label>
-              <input id="pName" type="text" placeholder="e.g. Jane Doe" />
+      <div class="flow-container">
+        <!-- Interactive CSS Diagram representing the 2-Stage Flow -->
+        <div class="tree-visual">
+          
+          <!-- Root Node: Ingestion -->
+          <div class="tree-node node-primary">
+            Image Ingestion Frame (224x224x3)
+          </div>
+
+          <!-- Connecting line handled in CSS -->
+
+          <!-- Stage 1 Node -->
+          <div class="tree-node" style="background: var(--slate-100); color: var(--text-main); border-color: var(--primary);">
+            Stage 1: Category Binary Classifier
+          </div>
+
+          <!-- Branches -->
+          <div class="node-branch-wrap">
+            
+            <!-- Left Branch: Allergy -->
+            <div class="branch-col">
+              <div class="tree-node node-allergy">
+                Skin Allergy Category
+              </div>
+              <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Stage 2 Specialized Models</div>
+              <div class="sub-leaves">
+                <div class="leaf-node">Atopic Dermatitis</div>
+                <div class="leaf-node">Contact Dermatitis</div>
+                <div class="leaf-node">Eczema</div>
+                <div class="leaf-node">Seborrheic Derm.</div>
+              </div>
             </div>
-            <div class="form-group">
-              <label for="pAge">Age</label>
-              <input id="pAge" type="number" placeholder="e.g. 34" min="0" max="120" />
+
+            <!-- Right Branch: Infection -->
+            <div class="branch-col">
+              <div class="tree-node node-infection">
+                Skin Infection Category
+              </div>
+              <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Stage 2 Specialized Models</div>
+              <div class="sub-leaves">
+                <div class="leaf-node">Scabies</div>
+                <div class="leaf-node">Tinea Corporis</div>
+              </div>
             </div>
-            <div class="form-group">
-              <label for="pGender">Gender</label>
-              <select id="pGender">
-                <option value="">Select…</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other</option>
-                <option>Prefer not to say</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="pArea">Affected Area</label>
-              <input id="pArea" type="text" placeholder="e.g. Left forearm" />
-            </div>
+
+          </div><!-- /.node-branch-wrap -->
+
+        </div><!-- /.tree-visual -->
+      </div><!-- /.flow-container -->
+    </section>
+
+    <!-- PROFESSIONAL WORKFLOW & SEGREGATION -->
+    <section class="sec" id="workflow" style="border-top: 1px solid rgba(226, 232, 240, 0.6);">
+      <div style="text-align: center; margin-bottom: 48px;">
+        <p class="hero-eye" style="margin: 0 auto 16px;">System Operations</p>
+        <h2 class="sec-title" style="margin-bottom: 12px;">Enterprise Workflow Demarcation</h2>
+        <p class="hero-sub" style="margin: 0 auto; max-width: 640px;">
+          The system strictly separates patient actions from dermatologist audits, ensuring absolute privacy, data integrity, and professional medical validation pipelines.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 36px;">
+        <!-- Patient Workflow Card -->
+        <div class="flow-container" style="border-left: 4px solid var(--accent);">
+          <span class="dc-cat infection" style="margin-bottom: 8px;">Patient Console Roles</span>
+          <h3 style="font-size: 24px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.02em;">Ingestion & Inferences</h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">
+            Patients securely log into their personal console to upload scans of lesions, run automatic deep learning predictions, and access historical reviews.
+          </p>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 13.5px; font-weight: 600; color: var(--slate-700);">
+            <li style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--accent)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg> Secure User Registration</li>
+            <li style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--accent)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg> Interactive Drag & Drop Scan Upload</li>
+            <li style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--accent)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg> Instant Hierarchical Classification</li>
+            <li style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--accent)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg> Visual Grad-CAM Activation Map</li>
+            <li style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--accent)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg> Dynamic PDF Report Downloads</li>
+          </ul>
+        </div>
+
+        <!-- Doctor Workflow Card -->
+        <div class="flow-container" style="border-left: 4px solid var(--primary);">
+          <span class="dc-cat allergy" style="margin-bottom: 8px;">Dermatologist Console Roles</span>
+          <h3 style="font-size: 24px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.02em;">Validation & Verification</h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">
+            Licensed specialists sign in to review patient scans, analyze spatial activation heatmaps, write notes, and approve or request re-examination.
+          </p>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 13.5px; font-weight: 600; color: var(--slate-700);">
+            <li style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--primary)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg> Exclusive Specialist Dashboard</li>
+            <li style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--primary)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg> Interactive Dual-Pane Audit Panel</li>
+            <li style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--primary)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg> Comparative Heatmap Assessment</li>
+            <li style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--primary)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg> Appending Certified Clinical Notes</li>
+            <li style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--primary)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg> Database Diagnosis Commit Logs</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP-BY-STEP PLATFORM PIPELINE -->
+    <section class="sec" style="border-top: 1px solid rgba(226, 232, 240, 0.6);">
+      <h2 class="sec-title" style="text-align: center;">Pipeline Flow Stages</h2>
+      
+      <div class="workflow-grid">
+        <div class="flow-step-card">
+          <div class="step-num">Step 01</div>
+          <h3 class="step-title">Ingestion Scan</h3>
+          <p class="step-desc">The patient uploads a high-definition photograph of the skin lesion. Images are preprocessed and formatted to the network's required dimensions.</p>
+        </div>
+
+        <div class="flow-step-card">
+          <div class="step-num">Step 02</div>
+          <h3 class="step-title">Binary Categorization</h3>
+          <p class="step-desc">The primary model evaluates visual pathology attributes to classify the lesion under broad "Skin Allergy" or "Skin Infection" groups.</p>
+        </div>
+
+        <div class="flow-step-card">
+          <div class="step-num">Step 03</div>
+          <h3 class="step-title">Specialist Inferences</h3>
+          <p class="step-desc">The image is routed to a specialized second-stage model to diagnose exact pathology (e.g. Scabies, Eczema, or Tinea Corporis).</p>
+        </div>
+
+        <div class="flow-step-card">
+          <div class="step-num">Step 04</div>
+          <h3 class="step-title">Grad-CAM Explainability</h3>
+          <p class="step-desc">Backpropagation gradients project visual heatmaps highlight pixel matrices which were central to the classification outputs.</p>
+        </div>
+
+        <div class="flow-step-card">
+          <div class="step-num">Step 05</div>
+          <h3 class="step-title">Dermatologist Review</h3>
+          <p class="step-desc">A certified clinician cross-checks the diagnostic results, validates the heatmap maps, and adds verified observations.</p>
+        </div>
+
+        <div class="flow-step-card">
+          <div class="step-num">Step 06</div>
+          <h3 class="step-title">Certified Reporting</h3>
+          <p class="step-desc">The final findings, metrics, heatmaps, and doctor observations are compiled into an official PDF report with disclaimer standards.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- REFERENCE DIRECTORY OF DETECTABLE CONDITIONS -->
+    <section class="sec" id="diseases">
+      <div class="dis-header">
+        <div>
+          <p class="hero-eye" style="margin: 0 0 10px 0;">Reference Library</p>
+          <h2 class="sec-title" style="margin: 0;">Detectable Pathologies</h2>
+        </div>
+        <div class="dis-filter">
+          <button class="fbtn active" onclick="filterDis('all', this)">All Conditions</button>
+          <button class="fbtn amber" onclick="filterDis('allergy', this)">Skin Allergy</button>
+          <button class="fbtn sage" onclick="filterDis('infection', this)">Skin Infection</button>
+        </div>
+      </div>
+
+      <div class="dis-grid">
+        <!-- Eczema -->
+        <div class="dc" data-cat="allergy">
+          <span class="dc-cat allergy">Allergy</span>
+          <h3 class="dc-name">Eczema</h3>
+          <p class="dc-desc">
+            Chronic inflammatory condition causing itchy, inflamed, and cracked skin patches linked to immune system dysregulations.
+          </p>
+          <div class="dc-syms">
+            <span class="dc-sym">Dry skin</span>
+            <span class="dc-sym">Erythema</span>
+            <span class="dc-sym">Intense Pruritus</span>
           </div>
         </div>
 
-        <!-- Upload + Results Grid -->
-        <div class="det-grid">
-          <!-- Upload Column -->
-          <div>
-            <div class="upload-box" id="dropZone">
-              <input type="file" id="fileInput" accept="image/*" />
-              <div class="up-icon">
-                <svg viewBox="0 0 24 24">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
-              </div>
-              <p class="up-title">Drop image here</p>
-              <p class="up-sub">PNG, JPG, WEBP — max 10 MB</p>
-              <button class="up-btn" type="button">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
-                Browse files
-              </button>
-            </div>
-
-            <div class="preview-box" id="previewBox">
-              <div class="prev-img">
-                <img id="prevImg" src="" alt="Preview" />
-              </div>
-              <div class="prev-meta">
-                <span class="prev-name" id="prevName"></span>
-                <button class="prev-change" onclick="resetUpload()">Change image</button>
-              </div>
-              <button class="run-btn" id="runBtn" onclick="runAnalysis()">
-                <span class="btn-label">Run Analysis</span>
-                <div class="loader"></div>
-              </button>
-              <div class="err-msg" id="errMsg"></div>
-            </div>
+        <!-- Contact Dermatitis -->
+        <div class="dc" data-cat="allergy">
+          <span class="dc-cat allergy">Allergy</span>
+          <h3 class="dc-name">Contact Dermatitis</h3>
+          <p class="dc-desc">
+            Local response triggered by exposure to external allergens or irritants, causing red papules or blistering surface rashes.
+          </p>
+          <div class="dc-syms">
+            <span class="dc-sym">Erythematous rash</span>
+            <span class="dc-sym">Vesicle formation</span>
+            <span class="dc-sym">Pruritus</span>
           </div>
+        </div>
 
-          <!-- Results Column -->
-          <div class="results-col">
-            <!-- Stage 1 -->
-            <div class="rb" id="rb1">
-              <div class="rb-head">
-                <span class="rb-stage">Stage 01 — Category</span>
-                <span class="rb-badge">Complete</span>
-              </div>
-              <div class="rb-result" id="res1">Ready to analyse</div>
-              <div class="rb-conf">
-                <div class="rb-conf-row">
-                  <span class="rb-conf-lbl">Confidence</span>
-                  <span class="rb-conf-val" id="confVal1">—</span>
-                </div>
-                <div class="conf-track">
-                  <div class="conf-fill" id="confFill1"></div>
-                </div>
-              </div>
-              <div class="chart-wrap">
-                <p class="chart-title">All probabilities</p>
-                <div id="chartBars1"></div>
-              </div>
-              <p class="rb-note">
-                Stage 1 identifies whether the condition is an allergy-type or
-                infection-type skin disease.
-              </p>
-            </div>
+        <!-- Seborrheic Dermatitis -->
+        <div class="dc" data-cat="allergy">
+          <span class="dc-cat allergy">Allergy</span>
+          <h3 class="dc-name">Seborrheic Dermatitis</h3>
+          <p class="dc-desc">
+            Chronic relapse disorder affecting oil-gland regions, causing flaky, greasy scaling patches linked to Malassezia yeast.
+          </p>
+          <div class="dc-syms">
+            <span class="dc-sym">Greasy scales</span>
+            <span class="dc-sym">Erythematous base</span>
+            <span class="dc-sym">Dandruff</span>
+          </div>
+        </div>
 
-            <!-- Stage 2 -->
-            <div class="rb" id="rb2">
-              <div class="rb-head">
-                <span class="rb-stage">Stage 02 — Disease</span>
-                <span class="rb-badge">Complete</span>
-              </div>
-              <div class="rb-result" id="res2">Awaiting stage 1</div>
-              <div class="rb-conf">
-                <div class="rb-conf-row">
-                  <span class="rb-conf-lbl">Confidence</span>
-                  <span class="rb-conf-val" id="confVal2">—</span>
-                </div>
-                <div class="conf-track">
-                  <div class="conf-fill" id="confFill2"></div>
-                </div>
-              </div>
-              <div class="chart-wrap">
-                <p class="chart-title">All probabilities</p>
-                <div id="chartBars2"></div>
-              </div>
-              <p class="rb-note">
-                Stage 2 pinpoints the specific skin disease within the identified
-                category using a specialised CNN model.
-              </p>
-            </div>
+        <!-- Atopic Dermatitis -->
+        <div class="dc" data-cat="allergy">
+          <span class="dc-cat allergy">Allergy</span>
+          <h3 class="dc-name">Atopic Dermatitis</h3>
+          <p class="dc-desc">
+            Severe, persistent type of eczema causing intensely itchy rashes, strongly linked to genetic mutations in skin barriers (e.g. filaggrin).
+          </p>
+          <div class="dc-syms">
+            <span class="dc-sym">Severe pruritus</span>
+            <span class="dc-sym">Lichenification</span>
+            <span class="dc-sym">Dryness</span>
+          </div>
+        </div>
 
-            <!-- PDF Button -->
-            <button class="pdf-btn" id="pdfBtn" onclick="downloadReport()">
-              <svg viewBox="0 0 24 24">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-              </svg>
-              Download PDF Report
-            </button>
+        <!-- Tinea Corporis -->
+        <div class="dc" data-cat="infection">
+          <span class="dc-cat infection">Infection</span>
+          <h3 class="dc-name">Tinea Corporis</h3>
+          <p class="dc-desc">
+            Superficial fungal infection (dermatophytosis) presenting as circular ring-like lesions with scaly, slightly raised margins.
+          </p>
+          <div class="dc-syms">
+            <span class="dc-sym">Annular plaques</span>
+            <span class="dc-sym">Raised scaly margin</span>
+            <span class="dc-sym">Clear center</span>
+          </div>
+        </div>
+
+        <!-- Scabies -->
+        <div class="dc" data-cat="infection">
+          <span class="dc-cat infection">Infection</span>
+          <h3 class="dc-name">Scabies</h3>
+          <p class="dc-desc">
+            Ectoparasitic skin infestation by microscopic mites (Sarcoptes scabiei) that burrow into the epidermis, causing extreme itching.
+          </p>
+          <div class="dc-syms">
+            <span class="dc-sym">Nocturnal itch</span>
+            <span class="dc-sym">Burrow markings</span>
+            <span class="dc-sym">Vesicular rash</span>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- DISEASES -->
-    <div id="diseases">
-      <div class="dis-wrap reveal">
-        <div class="dis-header">
-          <div>
-            <p class="sec-eye">Reference</p>
-            <h2 class="sec-title">Detectable Conditions</h2>
-          </div>
-          <div class="dis-filter">
-            <button class="fbtn active" onclick="filterDis('all', this)">All</button>
-            <button class="fbtn amber" onclick="filterDis('allergy', this)">Allergy</button>
-            <button class="fbtn sage" onclick="filterDis('infection', this)">Infection</button>
-          </div>
-        </div>
-        <div class="dis-grid">
-          <div class="dc" data-cat="allergy">
-            <span class="dc-cat allergy">Allergy</span>
-            <h3 class="dc-name">Eczema</h3>
-            <p class="dc-desc">
-              Chronic inflammatory condition causing itchy, inflamed and cracked
-              skin patches linked to immune dysregulation.
-            </p>
-            <div class="dc-syms">
-              <span class="dc-sym">Dry skin</span>
-              <span class="dc-sym">Pruritus</span>
-              <span class="dc-sym">Red patches</span>
-            </div>
-          </div>
-          <div class="dc" data-cat="allergy">
-            <span class="dc-cat allergy">Allergy</span>
-            <h3 class="dc-name">Contact Dermatitis</h3>
-            <p class="dc-desc">
-              Localised skin reaction from direct contact with an allergen or
-              irritant, presenting as erythematous rash.
-            </p>
-            <div class="dc-syms">
-              <span class="dc-sym">Redness</span>
-              <span class="dc-sym">Blistering</span>
-              <span class="dc-sym">Burning</span>
-            </div>
-          </div>
-          <div class="dc" data-cat="allergy">
-            <span class="dc-cat allergy">Allergy</span>
-            <h3 class="dc-name">Seborrheic Dermatitis</h3>
-            <p class="dc-desc">
-              Chronic condition affecting sebaceous areas, producing greasy
-              scales and erythema. Linked to Malassezia yeast.
-            </p>
-            <div class="dc-syms">
-              <span class="dc-sym">Dandruff</span>
-              <span class="dc-sym">Oily scales</span>
-              <span class="dc-sym">Pruritus</span>
-            </div>
-          </div>
-          <div class="dc" data-cat="allergy">
-            <span class="dc-cat allergy">Allergy</span>
-            <h3 class="dc-name">Atopic Dermatitis</h3>
-            <p class="dc-desc">
-              Severe chronic eczema with intense pruritus and relapsing
-              inflammation, strongly linked to genetic predisposition.
-            </p>
-            <div class="dc-syms">
-              <span class="dc-sym">Intense itch</span>
-              <span class="dc-sym">Lichenification</span>
-              <span class="dc-sym">Excoriation</span>
-            </div>
-          </div>
-          <div class="dc" data-cat="infection">
-            <span class="dc-cat infection">Infection</span>
-            <h3 class="dc-name">Tinea Corporis</h3>
-            <p class="dc-desc">
-              Superficial dermatophyte fungal infection presenting as an annular
-              erythematous lesion with a scaly advancing border.
-            </p>
-            <div class="dc-syms">
-              <span class="dc-sym">Ring-shaped</span>
-              <span class="dc-sym">Scaly margin</span>
-              <span class="dc-sym">Central clearing</span>
-            </div>
-          </div>
-          <div class="dc" data-cat="infection">
-            <span class="dc-cat infection">Infection</span>
-            <h3 class="dc-name">Scabies</h3>
-            <p class="dc-desc">
-              Ectoparasitic infestation by Sarcoptes scabiei producing intense
-              nocturnal pruritus and characteristic burrow tracks.
-            </p>
-            <div class="dc-syms">
-              <span class="dc-sym">Nocturnal itch</span>
-              <span class="dc-sym">Burrow tracks</span>
-              <span class="dc-sym">Papular rash</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    <!-- FOOTER -->
     <footer>
       <div class="ft-inner">
         <div>
-          <div class="ft-name">DermScan<sup>AI</sup></div>
+          <div class="ft-name">DermScan</div>
           <p class="ft-tag">
-            AI-powered skin condition analysis for dermatology research and
-            education.
+            Advanced medical decision support platform utilizing Hierarchical Deep Learning for skin disease diagnostics.
           </p>
         </div>
         <div class="ft-links">
-          <h4>Navigate</h4>
+          <h4>Platform Console</h4>
           <ul>
-            <li><a href="#detect">Analyse</a></li>
-            <li><a href="#diseases">Conditions</a></li>
+            <li><a href="/login">Access Patient Dashboard</a></li>
+            <li><a href="/login">Access Clinician Panel</a></li>
           </ul>
         </div>
       </div>
       <div class="ft-bottom">
-        <span class="ft-copy">DermScan AI — Final Year Project</span>
+        <span class="ft-copy">&copy; 2026 DermScan</span>
         <span class="ft-disc">
-          For research and educational use only. Not a substitute for medical advice.
+          Disclaimer: This system is designed for clinical training, support, and educational research purposes. All AI predictions must be clinically certified by a registered dermatologist.
         </span>
       </div>
     </footer>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- Utilities Script -->
+    <script>
+      function filterDis(cat, btn) {
+        document.querySelectorAll(".fbtn").forEach((b) => {
+          b.classList.remove("active");
+        });
+        btn.classList.add("active");
+        document.querySelectorAll(".dc").forEach((c) => {
+          c.style.display = (cat === "all" || c.dataset.cat === cat) ? "" : "none";
+        });
+      }
+    </script>
   </body>
 </html>

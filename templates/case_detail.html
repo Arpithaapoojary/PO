@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clinical Case Review File - DermScan</title>
+    <!-- Styled Core Sheet shared with Platforms -->
+    <link rel="stylesheet" href="../static/css/dashboard.css" />
+  </head>
+  <body>
+    <!-- MOBILE DRAWER OVERLAY -->
+    <div
+      class="sidebar-overlay"
+      id="sidebarOverlay"
+      onclick="closeSidebar()"
+    ></div>
+
+    <!-- HIGH-TECH SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">D</div>
+        <div class="logo-text">Derm<span>Scan</span></div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Medical Portal</div>
+        <a class="nav-item" id="navDashboardLink" href="/dashboard">
+          <!-- Back SVG Icon -->
+          <svg viewBox="0 0 24 24">
+            <path d="M19 12H5m7 7l-7-7 7-7" />
+          </svg>
+          Back to Dashboard
+        </a>
+
+        <div class="nav-section-label">Account Security</div>
+        <button class="nav-item" onclick="logout()" style="color: var(--danger);">
+          <!-- Logout SVG Icon -->
+          <svg viewBox="0 0 24 24" style="stroke: var(--danger);">
+            <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Logout Session
+        </button>
+      </nav>
+
+      <!-- CLINICAL USER CHIP -->
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <div class="avatar" id="sidebarAvatar">—</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebarName">Retrieving Profile...</div>
+            <div class="user-role" id="sidebarRole">Dermatology System</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN FILE CONSOLE AREA -->
+    <div class="main">
+      <!-- GLASS TOPBAR -->
+      <header class="topnav">
+        <div class="topnav-left">
+          <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle Side Navigation Menu">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.5" fill="none">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="breadcrumb">DermScan Clinical Platform / <span>Case File #${predId}</span></div>
+        </div>
+
+        <div class="topnav-right">
+          <button class="btn btn-ghost" id="btnReportDownload" style="display: none;">
+            Download PDF Report
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEWPORT MAIN CONTENT -->
+      <main class="content">
+        <!-- HEADER PROFILE BLOCK -->
+        <div class="welcome-banner animate-in delay-1">
+          <div class="welcome-text">
+            <div class="welcome-eyebrow" id="caseTitleEyebrow">Ingested Diagnostic File</div>
+            <h1 class="welcome-heading" id="caseTitleHeader">Case Record #${predId}</h1>
+            <p class="welcome-sub" id="casePatientDetails">
+              Patient Name: Loading... &middot; Age: Loading... &middot; Gender: Loading...
+            </p>
+          </div>
+        </div>
+
+        <!-- TIMELINE VALIDATION STATUS -->
+        <div style="background: var(--card-bg); border: 1px solid var(--surface-border); border-radius: var(--radius-md); padding: 24px; margin-bottom: 28px; box-shadow: var(--shadow-sm);" class="animate-in delay-2">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.08em; margin-bottom: 4px;">Clinical Verification Status</div>
+              <div class="review-status" id="caseReviewBadge">Pending Review</div>
+            </div>
+            <div style="display: flex; gap: 8px;" id="caseReviewActions">
+              <!-- Actions dynamically injected for Doctors -->
+            </div>
+          </div>
+        </div>
+
+        <!-- IMAGES COMPARISON SECTION -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px; margin-bottom: 32px;" class="animate-in delay-2">
+          <!-- RAW PHOTOGRAPH -->
+          <div style="background: var(--card-bg); border: 1px solid var(--surface-border); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm);">
+            <h3 style="font-size: 14px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; letter-spacing: 0.05em;">Original Skin Photograph</h3>
+            <div class="analysis-preview" style="display: block; margin-top: 0;">
+              <img id="caseOriginalImg" alt="Pathological Skin Case Photograph" />
+            </div>
+          </div>
+
+          <!-- HEATMAP COMPONENT -->
+          <div style="background: var(--card-bg); border: 1px solid var(--surface-border); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm);">
+            <h3 style="font-size: 14px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; letter-spacing: 0.05em;">Activation Attention Heatmap (Grad-CAM)</h3>
+            <div class="analysis-preview" style="display: block; margin-top: 0;">
+              <img id="caseGradcamImg" alt="Dermal Spatial Activation Heatmap" />
+            </div>
+          </div>
+        </div>
+
+        <!-- DIAGNOSTIC INFERENCE OUTCOMES -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px;" class="animate-in delay-3">
+          <!-- STAGE 1 CATEGORY -->
+          <div class="analysis-card">
+            <span>Stage 1 Primary Routing</span>
+            <h3 id="caseStage1Label">-</h3>
+            <div class="conf-section" style="margin-top: 12px;">
+              <div class="conf-header">
+                <span class="conf-label">Category Confidence</span>
+                <span class="conf-value" id="caseStage1Conf">-</span>
+              </div>
+              <div class="track"><div class="fill" id="caseStage1Fill" style="width: 0%;"></div></div>
+            </div>
+          </div>
+
+          <!-- STAGE 2 DISEASE -->
+          <div class="analysis-card">
+            <span>Stage 2 Inferred Pathology</span>
+            <h3 id="caseStage2Label">-</h3>
+            <div class="conf-section" style="margin-top: 12px;">
+              <div class="conf-header">
+                <span class="conf-label">Disease Confidence</span>
+                <span class="conf-value" id="caseStage2Conf">-</span>
+              </div>
+              <div class="track"><div class="fill" id="caseStage2Fill" style="width: 0%;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIAGNOSTIC OBSERVATION LOGS -->
+        <div style="background: var(--card-bg); border: 1px solid var(--surface-border); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-sm);" class="animate-in delay-3">
+          <h3 style="font-size: 14px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; letter-spacing: 0.05em;">Dermatologist Validation Observations</h3>
+          
+          <!-- Editing frame for specialists -->
+          <div id="doctorReviewPanel" style="display: none;">
+            <textarea
+              id="doctorNotesField"
+              class="review-textarea"
+              placeholder="Write detailed observation report, clinical validation remarks, or therapy advice..."
+              style="margin-top: 0; min-height: 120px;"
+            ></textarea>
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+              <button class="btn btn-primary" onclick="commitClinicalReview('Approved')">
+                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
+                Approve & Certify
+              </button>
+              <button class="btn btn-ghost" onclick="commitClinicalReview('Rejected')">
+                Reject & Flag
+              </button>
+            </div>
+          </div>
+
+          <!-- Read-only frame for patients -->
+          <div id="patientReviewPanel" style="display: none;">
+            <div class="doctor-note" style="margin-top: 0;">
+              <div class="doctor-note-label">Certified Clinical Log</div>
+              <div class="doctor-note-text" id="patientNotesText">Awaiting validation review by a registered dermatologist.</div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Client-side case logic -->
+    <script>
+      const predId = "${pred_id}"; // Dynamic template binding
+      let currentUser = null;
+      let currentCase = null;
+
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("sidebarOverlay").classList.toggle("open");
+      }
+
+      function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("sidebarOverlay").classList.remove("open");
+      }
+
+      async function initializeCasePage() {
+        try {
+          // 1. Fetch User Session Profile
+          const userRes = await fetch("/api/me", { credentials: "include" });
+          currentUser = await userRes.json();
+          if (!userRes.ok || currentUser.error) {
+            window.location.href = "/login";
+            return;
+          }
+
+          // Populate user layout elements
+          document.getElementById("sidebarName").textContent = currentUser.name;
+          document.getElementById("sidebarRole").textContent = currentUser.role === "doctor" ? "Dermatologist" : "Patient";
+          document.getElementById("sidebarAvatar").textContent = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : "D";
+
+          // Set navbar redirection back targets
+          const backLink = document.getElementById("navDashboardLink");
+          if (currentUser.role === "doctor") {
+            backLink.href = "/doctor";
+            backLink.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 12H5m7 7l-7-7 7-7" /></svg> Back to Cases`;
+          } else {
+            backLink.href = "/dashboard";
+          }
+
+          // 2. Fetch Ingested Case Details
+          const caseRes = await fetch(`/api/prediction/${predId}`, { credentials: "include" });
+          currentCase = await caseRes.json();
+          if (!caseRes.ok || currentCase.error) {
+            alert(currentCase.error || "Failed to load case details.");
+            window.location.href = currentUser.role === "doctor" ? "/doctor" : "/dashboard";
+            return;
+          }
+
+          renderCaseData();
+        } catch (err) {
+          console.error("Initialization failure:", err);
+          window.location.href = "/login";
+        }
+      }
+
+      function renderCaseData() {
+        // Patient metadata display
+        document.getElementById("casePatientDetails").innerHTML = 
+          `Patient Name: <b>${currentCase.patient_name}</b> &middot; Age: <b>${currentCase.patient_age || "N/A"}</b> &middot; Gender: <b>${currentCase.patient_gender || "N/A"}</b>`;
+        
+        // Scan images binding
+        document.getElementById("caseOriginalImg").src = `/uploads/${currentCase.image_path}`;
+        if (currentCase.gradcam_path) {
+          document.getElementById("caseGradcamImg").src = `/uploads/gradcam/${currentCase.gradcam_path}`;
+        } else {
+          document.getElementById("caseGradcamImg").alt = "Activation map not generated.";
+        }
+
+        // Status badge configuration
+        const status = currentCase.review_status || "Pending";
+        const badge = document.getElementById("caseReviewBadge");
+        badge.textContent = status;
+        badge.className = "review-status " + (
+          status === "Approved" ? "review-approved" :
+          status === "Rejected" ? "review-rejected" : "review-pending"
+        );
+
+        // AI Results
+        document.getElementById("caseStage1Label").textContent = currentCase.stage1_label === "allergy" ? "Skin Allergy" : "Skin Infection";
+        document.getElementById("caseStage1Conf").textContent = currentCase.stage1_conf ? currentCase.stage1_conf + "%" : "100%";
+        document.getElementById("caseStage1Fill").style.width = currentCase.stage1_conf ? currentCase.stage1_conf + "%" : "100%";
+
+        document.getElementById("caseStage2Label").textContent = currentCase.stage2_label;
+        document.getElementById("caseStage2Conf").textContent = currentCase.stage2_conf + "%";
+        document.getElementById("caseStage2Fill").style.width = currentCase.stage2_conf + "%";
+
+        // Dynamic action configuration based on roles
+        const btnReport = document.getElementById("btnReportDownload");
+        btnReport.onclick = () => downloadCaseReport();
+        btnReport.style.display = "inline-flex";
+
+        if (currentUser.role === "doctor") {
+          document.getElementById("doctorReviewPanel").style.display = "block";
+          document.getElementById("doctorNotesField").value = currentCase.doctor_note || "";
+        } else {
+          document.getElementById("patientReviewPanel").style.display = "block";
+          if (currentCase.doctor_note) {
+            document.getElementById("patientNotesText").textContent = currentCase.doctor_note;
+          }
+        }
+      }
+
+      async function commitClinicalReview(status) {
+        const note = document.getElementById("doctorNotesField").value.trim();
+        if (!note) {
+          alert("Please write clinical observations before submitting.");
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/add-note", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              prediction_id: predId,
+              note: note,
+              status: status
+            })
+          });
+
+          const data = await res.json();
+          if (data.error) {
+            alert(data.error);
+            return;
+          }
+
+          alert(`Clinical audit submitted successfully: ${status}`);
+          window.location.reload();
+        } catch (err) {
+          alert("Failed to commit validation audit.");
+        }
+      }
+
+      async function downloadCaseReport() {
+        try {
+          // Fetch Original File Bytes
+          const originalRes = await fetch(`/uploads/${currentCase.image_path}`);
+          const originalBlob = await originalRes.blob();
+          const originalBase64 = await blobToBase64(originalBlob);
+
+          // Fetch Grad-CAM Bytes
+          let gradcamBase64 = null;
+          if (currentCase.gradcam_path) {
+            const gradcamRes = await fetch(`/uploads/gradcam/${currentCase.gradcam_path}`);
+            const gradcamBlob = await gradcamRes.blob();
+            gradcamBase64 = await blobToBase64(gradcamBlob);
+          }
+
+          // Generate Report API
+          const res = await fetch("/api/report", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              patient: {
+                name: currentCase.patient_name,
+                age: currentCase.patient_age || "N/A",
+                gender: currentCase.patient_gender || "N/A",
+                area: "Ingested Scan"
+              },
+              stage1: {
+                raw: currentCase.stage1_label,
+                confidence: currentCase.stage1_conf || 100
+              },
+              stage2: {
+                raw: currentCase.stage2_label,
+                confidence: currentCase.stage2_conf
+              },
+              original_image: originalBase64,
+              gradcam_image: gradcamBase64,
+              doctor_note: currentCase.doctor_note || "",
+              review_status: currentCase.review_status || "Pending"
+            })
+          });
+
+          const data = await res.json();
+          if (data.error) {
+            alert(data.error);
+            return;
+          }
+
+          const link = document.createElement("a");
+          link.href = `data:application/pdf;base64,${data.pdf}`;
+          link.download = `DermScan_Report_${predId}.pdf`;
+          link.click();
+        } catch (err) {
+          alert("Could not compile report file.");
+        }
+      }
+
+      function blobToBase64(blob) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      async function logout() {
+        try {
+          await fetch("/api/logout", { method: "POST", credentials: "include" });
+          window.location.href = "/login";
+        } catch (err) {
+          alert("Logout failed");
+        }
+      }
+
+      // Initialize Page
+      initializeCasePage();
+    </script>
+  </body>
+</html>

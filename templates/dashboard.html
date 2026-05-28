@@ -2,217 +2,249 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>DermScan Patient Dashboard</title>
-
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-
+    <title>Patient Diagnostic Console - DermScan</title>
+    <!-- GTM/SEO Elements -->
+    <meta name="description" content="Securely upload skin lesion photos, track hierarchical AI classifications, and view dermatologist clinical validation reports." />
+    <!-- Styled Core Sheet -->
     <link rel="stylesheet" href="../static/css/dashboard.css" />
   </head>
-
   <body>
-    <!-- MOBILE OVERLAY -->
-
+    <!-- MOBILE DRAWER OVERLAY -->
     <div
       class="sidebar-overlay"
       id="sidebarOverlay"
       onclick="closeSidebar()"
     ></div>
 
-    <!-- SIDEBAR -->
-
+    <!-- HIGH-TECH SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-logo">
         <div class="logo-icon">D</div>
-
         <div class="logo-text">Derm<span>Scan</span></div>
       </div>
 
       <nav class="sidebar-nav">
-        <div class="nav-section-label">MAIN</div>
+        <div class="nav-section-label">Main Console</div>
+        <a class="nav-item active" href="#">
+          <!-- Grid Icon SVG -->
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" />
+          </svg>
+          Console Home
+        </a>
+        <a class="nav-item" href="#" onclick="goHome()">
+          <!-- Ingestion Icon SVG -->
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3v18M3 12h18M12 3l4 4-4-4-4 4M12 21l4-4-12 0" />
+          </svg>
+          Ingest Scan
+        </a>
 
-        <a class="nav-item active" href="#"> Dashboard </a>
+        <div class="nav-section-label">Medical Records</div>
+        <a class="nav-item" href="#historyGrid">
+          <!-- Clock Icon SVG -->
+          <svg viewBox="0 0 24 24">
+            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Scan History
+        </a>
 
-        <a class="nav-item" href="#" onclick="goHome()"> New Analysis </a>
-
-        <div class="nav-section-label">REPORTS</div>
-
-        <a class="nav-item" href="#"> My History </a>
-
-        <a class="nav-item" href="#"> Reports </a>
-
-        <div class="nav-section-label">ACCOUNT</div>
-
-        <button class="nav-item" onclick="logout()">Logout</button>
+        <div class="nav-section-label">Account Security</div>
+        <button class="nav-item" onclick="logout()" style="color: var(--danger);">
+          <!-- Power Icon SVG -->
+          <svg viewBox="0 0 24 24" style="stroke: var(--danger);">
+            <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Logout Session
+        </button>
       </nav>
 
-      <!-- USER -->
-
+      <!-- CLINICAL USER CHIP -->
       <div class="sidebar-footer">
         <div class="user-chip">
           <div class="avatar" id="sidebarAvatar">—</div>
-
           <div class="user-info">
-            <div class="user-name" id="sidebarName">Loading...</div>
-
+            <div class="user-name" id="sidebarName">Retrieving Profile...</div>
             <div class="user-role" id="sidebarRole">Patient</div>
           </div>
         </div>
       </div>
     </aside>
 
-    <!-- MAIN -->
-
+    <!-- MAIN CONSOLE DISPLAY AREA -->
     <div class="main">
-      <!-- TOPBAR -->
-
+      <!-- GLASS TOPBAR -->
       <header class="topnav">
         <div class="topnav-left">
-          <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-
-          <div class="breadcrumb">DermScan / Patient Dashboard</div>
+          <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle Side Navigation Menu">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.5" fill="none">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="breadcrumb">DermScan Clinical Platform / <span>Patient Console</span></div>
         </div>
 
         <div class="topnav-right">
           <button class="btn btn-primary" onclick="goHome()">
-            New Analysis
+            <svg viewBox="0 0 24 24"><path d="M12 4v16m-8-8h16" /></svg>
+            Ingest Skin Scan
           </button>
-
-          <button class="btn btn-ghost" onclick="logout()">Logout</button>
         </div>
       </header>
 
-      <!-- CONTENT -->
-
+      <!-- VIEWPORT MAIN CONTENT -->
       <main class="content">
-        <!-- HERO -->
-
-        <div class="welcome-banner">
+        <!-- WELCOME HERO COMPONENT -->
+        <div class="welcome-banner animate-in delay-1">
           <div class="welcome-text">
-            <div class="welcome-eyebrow">AI ASSISTED DERMATOLOGY</div>
-
+            <div class="welcome-eyebrow">DermScan Decision Support Suite</div>
             <h1 class="welcome-heading" id="welcomeText">Welcome</h1>
-
             <p class="welcome-sub">
-              Upload skin images and receive AI-powered dermatology analysis
-              with clinical review support.
+              Upload photographs of lesions, run automatic multi-stage predictions, and trace validated observations recorded by your reviewing specialist.
             </p>
           </div>
         </div>
 
-        <!-- STATS -->
-
-        <div class="stats">
+        <!-- STATISTICAL METRICS SECTION -->
+        <div class="stats animate-in delay-2">
+          <!-- Total Analyses -->
           <div class="stat-card">
-            <div class="stat-label">Total Analyses</div>
-
+            <div class="stat-header">
+              <div class="stat-label">Analyses Processed</div>
+              <div class="stat-icon icon-teal">
+                <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+              </div>
+            </div>
             <div class="stat-value" id="totalPredictions">—</div>
+            <div class="stat-footer">
+              <span>Fully Tracked Records</span>
+            </div>
           </div>
 
+          <!-- Recent Diagnostics -->
           <div class="stat-card">
-            <div class="stat-label">Recent Prediction</div>
-
-            <div class="stat-value" id="recentDisease">—</div>
+            <div class="stat-header">
+              <div class="stat-label">Last Classified Condition</div>
+              <div class="stat-icon icon-amber">
+                <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+              </div>
+            </div>
+            <div class="stat-value small" id="recentDisease">—</div>
+            <div class="stat-footer">
+              <span>Automatic ML Routing</span>
+            </div>
           </div>
 
+          <!-- Audit validation status -->
           <div class="stat-card">
-            <div class="stat-label">Clinical Reviews</div>
-
-            <div class="stat-value">Active</div>
+            <div class="stat-header">
+              <div class="stat-label">Review Status</div>
+              <div class="stat-icon icon-slate">
+                <svg viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+              </div>
+            </div>
+            <div class="stat-value small">Active Clinic</div>
+            <div class="stat-footer">
+              <span>Certified Doctor Inquiries</span>
+            </div>
           </div>
         </div>
 
-        <!-- HISTORY -->
-
-        <div class="section">
+        <!-- ANALYSIS RECORDS PANEL -->
+        <div class="section animate-in delay-3">
           <div class="section-head">
             <div>
-              <div class="section-title">My Analysis History</div>
-
+              <h2 class="section-title">Ingested Skin Lesion Scans</h2>
               <div class="section-sub">
-                AI predictions, Grad-CAM visualizations, and doctor feedback
+                Select a scan case card below to inspect the corresponding pathology timeline, maps, and certified PDF report downloads.
               </div>
             </div>
           </div>
 
           <div class="history-body">
+            <!-- Dynamic Grid managed by dashboard.js -->
             <div class="grid" id="historyGrid"></div>
           </div>
         </div>
       </main>
     </div>
 
-    <!-- ANALYSIS MODAL -->
-
+    <!-- ANALYSIS INGESTION MODAL OVERLAY -->
     <div class="analysis-modal" id="analysisModal">
       <div class="analysis-box">
-        <button class="close-analysis" onclick="closeAnalysis()">✕</button>
+        <button class="close-analysis" onclick="closeAnalysis()" aria-label="Close Diagnostic Workspace">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
 
         <div class="analysis-head">
-          <div class="welcome-eyebrow">AI ANALYSIS</div>
-
-          <h2 class="analysis-title">New Skin Analysis</h2>
-
+          <div class="welcome-eyebrow">DermScan Ingestion Console</div>
+          <h2 class="analysis-title">Ingest Skin Scan</h2>
           <p class="analysis-sub">
-            Upload image for AI-powered disease prediction
+            Drag, drop, or select a clear high-resolution clinical photograph of the skin pathology.
           </p>
         </div>
 
-        <!-- UPLOAD -->
-
+        <!-- STYLED FILE DROPZONE -->
         <div class="upload-zone" id="analysisDropZone">
           <input type="file" id="analysisInput" hidden accept="image/*" />
-
-          <div class="upload-icon-big">⬆</div>
-
-          <h3>Upload Skin Image</h3>
+          <div class="upload-icon-big">
+            <!-- Upload Arrow SVG -->
+            <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2.5" fill="none">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+            </svg>
+          </div>
+          <h3>Select Lesion Photo</h3>
+          <p style="font-size: 13px; color: var(--text-muted); font-weight: 500;">PNG, JPG formats. Refrain from blurry lighting.</p>
         </div>
 
-        <!-- PREVIEW -->
-
+        <!-- UPLOADED IMAGE PREVIEW -->
         <div class="analysis-preview" id="analysisPreview">
-          <img id="analysisImg" />
+          <img id="analysisImg" alt="Pathological Skin Ingestion Preview" />
         </div>
 
-        <!-- RUN -->
-
+        <!-- RUN TRIGGER BUTTON -->
         <button class="btn btn-primary run-btn" onclick="runAnalysis()">
-          Run AI Analysis
+          <!-- Lightning Icon SVG -->
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
+          Run AI Classification
         </button>
 
-        <!-- RESULTS -->
-
+        <!-- COMPUTATIONAL CLASSIFICATION OUTCOMES -->
         <div class="analysis-results">
           <div class="analysis-card">
-            <span> Stage 1 Category </span>
-
+            <span>Stage 1 Primary Routing</span>
             <h3 id="stage1Result">-</h3>
           </div>
 
           <div class="analysis-card">
-            <span> Final Disease </span>
-
+            <span>Stage 2 Classified Disease</span>
             <h3 id="stage2Result">-</h3>
           </div>
         </div>
 
-        <!-- GRADCAM -->
-
+        <!-- GRAD-CAM VISUAL EXPLAINABILITY COMPONENT -->
         <div id="gradcamSection" class="gradcam-box" style="display: none">
-          <h3>AI Attention Heatmap</h3>
-
-          <img id="gradcamImg" />
+          <h3>Visual Activation Attention Map (Grad-CAM)</h3>
+          <img id="gradcamImg" alt="Dermal Spatial Activation Heatmap" />
+          <p style="font-size: 13px; color: var(--text-muted); margin-top: 14px; line-height: 1.5;">
+            The diagnostic attention heatmap displays spatial pixel blocks that triggered the specialized classification outputs. Warm colors (red/orange) represent primary visual markers.
+          </p>
         </div>
       </div>
     </div>
 
-    <!-- JS -->
-
+    <!-- Core Interactions Script -->
     <script src="../static/js/dashboard.js"></script>
   </body>
 </html>

@@ -21,11 +21,14 @@ from reportlab.platypus import (
     SimpleDocTemplate,
     Paragraph,
     Spacer,
-    Image
+    Image as RLImage,
+    Table,
+    TableStyle
 )
 from reportlab.lib.pagesizes import letter
 
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
@@ -805,232 +808,144 @@ def generate_report():
         story = []
 
         # TITLE
-
-        story.append(
-
-            Paragraph(
-                "<font size=22><b>DermScan AI Clinical Report</b></font>",
-                styles['Title']
-            )
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Title'],
+            fontSize=24,
+            textColor=colors.HexColor('#0F766E'),
+            spaceAfter=30
         )
-
-        story.append(Spacer(1, 20))
+        story.append(Paragraph("<b>DermScan Clinical Report</b>", title_style))
 
         # PATIENT DETAILS
-
-        story.append(
-
-            Paragraph(
-                "<b>Patient Information</b>",
-                styles['Heading2']
-            )
+        section_heading = ParagraphStyle(
+            'SectionHeading',
+            parent=styles['Heading2'],
+            fontSize=14,
+            textColor=colors.HexColor('#334155'),
+            spaceAfter=10,
+            spaceBefore=15
+        )
+        body_style = ParagraphStyle(
+            'CustomBody',
+            parent=styles['BodyText'],
+            fontSize=11,
+            textColor=colors.HexColor('#475569'),
+            leading=16
         )
 
-        patient_html = f'''
-        <br/>
-        <b>Name:</b> {patient.get("name", "N/A")}<br/>
-        <b>Age:</b> {patient.get("age", "N/A")}<br/>
-        <b>Gender:</b> {patient.get("gender", "N/A")}<br/>
-        <b>Affected Area:</b> {patient.get("area", "N/A")}<br/>
-        '''
-
-        story.append(
-            Paragraph(
-                patient_html,
-                styles['BodyText']
-            )
-        )
-
+        story.append(Paragraph("<b>Patient Information</b>", section_heading))
+        patient_data = [
+            [Paragraph("<b>Name:</b>", body_style), Paragraph(patient.get("name", "N/A"), body_style),
+             Paragraph("<b>Age:</b>", body_style), Paragraph(str(patient.get("age", "N/A")), body_style)],
+            [Paragraph("<b>Gender:</b>", body_style), Paragraph(patient.get("gender", "N/A"), body_style),
+             Paragraph("<b>Affected Area:</b>", body_style), Paragraph(patient.get("area", "N/A"), body_style)]
+        ]
+        patient_table = Table(patient_data, colWidths=[60, 150, 60, 150])
+        patient_table.setStyle(TableStyle([
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#F8FAFC')),
+            ('BOX', (0,0), (-1,-1), 0.5, colors.HexColor('#E2E8F0')),
+            ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor('#E2E8F0')),
+            ('TOPPADDING', (0,0), (-1,-1), 8),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+            ('LEFTPADDING', (0,0), (-1,-1), 8),
+            ('RIGHTPADDING', (0,0), (-1,-1), 8),
+        ]))
+        story.append(patient_table)
         story.append(Spacer(1, 20))
 
-        # ORIGINAL IMAGE
+        # IMAGES (Side by Side)
+        story.append(Paragraph("<b>Clinical Images</b>", section_heading))
+        img_data = [[None, None], [Paragraph("<b>Original Image</b>", body_style), Paragraph("<b>AI Attention Heatmap</b>", body_style)]]
+        
+        orig_img_obj = None
+        grad_img_obj = None
 
         if original_image:
-
             try:
-
-                original_bytes = base64.b64decode(
-                    original_image.split(',')[1]
-                )
-
-                original_temp = tempfile.NamedTemporaryFile(
-                    delete=False,
-                    suffix='.jpg'
-                )
-
+                original_bytes = base64.b64decode(original_image.split(',')[1])
+                original_temp = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
                 original_temp.write(original_bytes)
-
                 original_temp.close()
-
-                story.append(
-                    Paragraph(
-                        "<b>Original Skin Image</b>",
-                        styles['Heading2']
-                    )
-                )
-
-                story.append(Spacer(1, 10))
-
-                story.append(
-                    Image(
-                        original_temp.name,
-                        width=250,
-                        height=250
-                    )
-                )
-
-                story.append(Spacer(1, 20))
-
+                orig_img_obj = RLImage(original_temp.name, width=200, height=200)
             except:
-
                 pass
-
-        # GRADCAM IMAGE
-
+                
         if gradcam_image:
-
             try:
-
-                gradcam_bytes = base64.b64decode(
-                    gradcam_image.split(',')[1]
-                )
-
-                gradcam_temp = tempfile.NamedTemporaryFile(
-                    delete=False,
-                    suffix='.jpg'
-                )
-
+                gradcam_bytes = base64.b64decode(gradcam_image.split(',')[1])
+                gradcam_temp = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
                 gradcam_temp.write(gradcam_bytes)
-
                 gradcam_temp.close()
-
-                story.append(
-                    Paragraph(
-                        "<b>AI Attention Heatmap (Grad-CAM)</b>",
-                        styles['Heading2']
-                    )
-                )
-
-                story.append(Spacer(1, 10))
-
-                story.append(
-                    Image(
-                        gradcam_temp.name,
-                        width=250,
-                        height=250
-                    )
-                )
-
-                story.append(Spacer(1, 20))
-
+                grad_img_obj = RLImage(gradcam_temp.name, width=200, height=200)
             except:
-
                 pass
+
+        if orig_img_obj or grad_img_obj:
+            img_data[0][0] = orig_img_obj if orig_img_obj else ""
+            img_data[0][1] = grad_img_obj if grad_img_obj else ""
+            img_table = Table(img_data, colWidths=[250, 250])
+            img_table.setStyle(TableStyle([
+                ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                ('TOPPADDING', (0,1), (-1,1), 10),
+            ]))
+            story.append(img_table)
+        
+        story.append(Spacer(1, 20))
 
         # AI RESULTS
-
-        story.append(
-            Paragraph(
-                "<b>AI Prediction Results</b>",
-                styles['Heading2']
-            )
-        )
-
-        result_html = f'''
-        <br/>
-
-        <b>Stage 1 Category:</b>
-        {stage1.get("raw", "N/A")}<br/>
-
-        <b>Stage 1 Confidence:</b>
-        {stage1.get("confidence", "N/A")}%<br/><br/>
-
-        <b>Detected Disease:</b>
-        {stage2.get("raw", "N/A")}<br/>
-
-        <b>Disease Confidence:</b>
-        {stage2.get("confidence", "N/A")}%<br/>
-        '''
-
-        story.append(
-            Paragraph(
-                result_html,
-                styles['BodyText']
-            )
-        )
-
+        story.append(Paragraph("<b>AI Prediction Results</b>", section_heading))
+        ai_data = [
+            [Paragraph("<b>Stage 1 Category:</b>", body_style), Paragraph(str(stage1.get("raw", "N/A")), body_style)],
+            [Paragraph("<b>Stage 1 Confidence:</b>", body_style), Paragraph(f"{stage1.get('confidence', 'N/A')}%", body_style)],
+            [Paragraph("<b>Detected Disease:</b>", body_style), Paragraph(str(stage2.get("raw", "N/A")), body_style)],
+            [Paragraph("<b>Disease Confidence:</b>", body_style), Paragraph(f"{stage2.get('confidence', 'N/A')}%", body_style)]
+        ]
+        ai_table = Table(ai_data, colWidths=[150, 250])
+        ai_table.setStyle(TableStyle([
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('LINEBELOW', (0,0), (-1,-2), 0.5, colors.HexColor('#E2E8F0')),
+            ('TOPPADDING', (0,0), (-1,-1), 8),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ]))
+        story.append(ai_table)
         story.append(Spacer(1, 20))
 
         # DOCTOR REVIEW
+        story.append(Paragraph("<b>Clinical Review</b>", section_heading))
+        review_text = doctor_note if doctor_note else "Awaiting doctor review."
+        rev_data = [
+            [Paragraph("<b>Review Status:</b>", body_style), Paragraph(str(review_status), body_style)],
+            [Paragraph("<b>Doctor Notes:</b>", body_style), Paragraph(review_text, body_style)]
+        ]
+        rev_table = Table(rev_data, colWidths=[120, 300])
+        rev_table.setStyle(TableStyle([
+            ('VALIGN', (0,0), (-1,-1), 'TOP'),
+            ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#F8FAFC')),
+            ('BOX', (0,0), (-1,-1), 0.5, colors.HexColor('#E2E8F0')),
+            ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor('#E2E8F0')),
+            ('TOPPADDING', (0,0), (-1,-1), 8),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+            ('LEFTPADDING', (0,0), (-1,-1), 8),
+            ('RIGHTPADDING', (0,0), (-1,-1), 8),
+        ]))
+        story.append(rev_table)
+        story.append(Spacer(1, 30))
 
-        story.append(
-            Paragraph(
-                "<b>Clinical Review</b>",
-                styles['Heading2']
-            )
-        )
-
-        doctor_html = f'''
-        <br/>
-
-        <b>Review Status:</b>
-        {review_status}<br/><br/>
-
-        <b>Doctor Notes:</b><br/>
-
-        {
-            doctor_note
-            if doctor_note
-            else "Awaiting doctor review."
-        }
-        '''
-
-        story.append(
-            Paragraph(
-                doctor_html,
-                styles['BodyText']
-            )
-        )
-
-        story.append(Spacer(1, 20))
-
-        # DISCLAIMER
-
+        # DISCLAIMER & FOOTER
         disclaimer = """
-        <font size=10>
-
-        <b>Disclaimer:</b><br/><br/>
-
-        This report is generated using an AI-assisted
-        skin disease classification system for
-        educational and research purposes only.
-
-        The generated predictions should not be treated
-        as a final medical diagnosis.
-
-        Please consult a qualified dermatologist for
-        professional clinical evaluation.
-
+        <font size=9 color="#64748B">
+        <b>Disclaimer:</b><br/>
+        This report is generated using an AI-assisted skin disease classification system.
+        The generated predictions should not be treated as a final medical diagnosis.
+        Please consult a qualified dermatologist for professional clinical evaluation.
         </font>
         """
-
-        story.append(
-            Paragraph(
-                disclaimer,
-                styles['BodyText']
-            )
-        )
-
-        story.append(Spacer(1, 20))
-
-        # FOOTER
-
-        story.append(
-            Paragraph(
-                "<font size=10><i>Generated by DermScan AI Platform</i></font>",
-                styles['Italic']
-            )
-        )
+        story.append(Paragraph(disclaimer, styles['Normal']))
+        story.append(Spacer(1, 10))
+        story.append(Paragraph("<font size=9 color='#94A3B8'><i>Generated by DermScan</i></font>", styles['Normal']))
 
         # BUILD PDF
 

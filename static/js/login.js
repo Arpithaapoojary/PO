@@ -62,8 +62,8 @@ function showMessage(boxId, message, type = "success") {
   const box = document.getElementById(boxId);
   const icon =
     type === "success"
-      ? `<span class="msg-icon">✓</span>`
-      : `<span class="msg-icon">⚠</span>`;
+      ? `<span class="msg-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none" style="display: block;"><path d="M20 6L9 17l-5-5"/></svg></span>`
+      : `<span class="msg-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none" style="display: block;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>`;
   box.className = `msg show ${type}`;
   box.innerHTML = `${icon}<span>${message}</span>`;
 }

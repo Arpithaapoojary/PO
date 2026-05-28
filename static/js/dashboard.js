@@ -1,6 +1,6 @@
 /* ─────────────────────────────────────────
    MOBILE SIDEBAR
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 function toggleSidebar() {
   document.getElementById("sidebar").classList.toggle("open");
@@ -16,13 +16,13 @@ function closeSidebar() {
 
 /* ─────────────────────────────────────────
    GLOBALS
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 let selectedFile = null;
 
 /* ─────────────────────────────────────────
    LOAD USER
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 async function loadUser() {
   try {
@@ -63,7 +63,7 @@ async function loadUser() {
 
 /* ─────────────────────────────────────────
    LOAD HISTORY
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 async function loadHistory() {
   try {
@@ -111,171 +111,58 @@ async function loadHistory() {
 
     data.forEach((item) => {
       const status = item.review_status || "Pending";
-
       const dateStr = new Date(item.created_at).toLocaleDateString();
-
       const card = document.createElement("div");
-
       card.className = "card";
 
       card.innerHTML = `
-
         <div class="img-wrap">
-
-          <img
-            src="/uploads/${item.image_path}">
-
+          <img src="/uploads/${item.image_path}" alt="Scan">
+          <div class="img-overlay"></div>
         </div>
-
         <div class="card-body">
-
           <div class="card-top">
-
-            <div class="badge">
-
-              ${item.stage1_label}
-
-            </div>
-
-            <span class="card-id">
-
-              #${item.id}
-
-            </span>
-
+            <div class="badge">${item.stage1_label}</div>
+            <span class="card-id">#${item.id}</span>
           </div>
-
-          <div class="disease">
-
-            ${item.stage2_label}
-
-          </div>
-
-          <!-- CONFIDENCE -->
-
+          <div class="disease">${item.stage2_label}</div>
           <div class="conf-section">
-
             <div class="conf-header">
-
-              <span class="conf-label">
-
-                AI Confidence
-
-              </span>
-
-              <span class="conf-value">
-
-                ${item.stage2_conf}%
-
-              </span>
-
+              <span class="conf-label">AI Confidence</span>
+              <span class="conf-value">${item.stage2_conf}%</span>
             </div>
-
             <div class="track">
-
-              <div
-                class="fill"
-                style="
-                  width:${item.stage2_conf}%
-                ">
-
-              </div>
-
+              <div class="fill" style="width:${item.stage2_conf}%"></div>
             </div>
-
           </div>
-
-          <!-- REVIEW STATUS -->
-
-          <div
-            class="
-              review-status
-              ${
-                status === "Approved"
-                  ? "review-approved"
-                  : status === "Rejected"
-                    ? "review-rejected"
-                    : "review-pending"
-              }
-            ">
-
-            ${status}
-
-          </div>
-
-          <!-- DOCTOR NOTE -->
-
+          <div class="review-status ${
+            status === "Approved"
+              ? "review-approved"
+              : status === "Rejected"
+                ? "review-rejected"
+                : "review-pending"
+          }">${status}</div>
           ${
             item.doctor_note
-              ? `
-            <div class="doctor-note">
-
-              <div class="doctor-note-label">
-
-                Doctor Review
-
-              </div>
-
-              <div class="doctor-note-text">
-
-                ${item.doctor_note}
-
-              </div>
-
-            </div>
-            `
-              : `
-            <div class="doctor-note">
-
-              <div class="doctor-note-label">
-
-                Review Status
-
-              </div>
-
-              <div class="doctor-note-text">
-
-                Awaiting doctor review.
-
-              </div>
-
-            </div>
-            `
+              ? `<div class="doctor-note">
+                  <div class="doctor-note-label">Doctor Review</div>
+                  <div class="doctor-note-text">${item.doctor_note}</div>
+                </div>`
+              : `<div class="doctor-note">
+                  <div class="doctor-note-label">Review Status</div>
+                  <div class="doctor-note-text">Awaiting doctor review.</div>
+                </div>`
           }
-
-          <!-- FOOTER -->
-
           <div class="card-footer">
-
-  <div class="card-date">
-
-    ${dateStr}
-
-  </div>
-
-  <button
-    class="btn btn-primary btn-sm"
-    onclick='downloadReport(${JSON.stringify(item)})'>
-
-    Download Report
-
-  </button>
-
-</div>
-
-            <span
-              style="
-                font-size:12px;
-                font-weight:600;
-                color:var(--teal-700);
-              ">
-
-              AI Analysis
-
-            </span>
-
+            <div class="card-date">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              ${dateStr}
+            </div>
+            <button class="btn btn-primary btn-sm" onclick='downloadReport(${JSON.stringify(item)})'>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              Report
+            </button>
           </div>
-
         </div>
       `;
 
@@ -288,7 +175,7 @@ async function loadHistory() {
 
 /* ─────────────────────────────────────────
    ANALYSIS MODAL
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 function goHome() {
   document.getElementById("analysisModal").classList.add("show");
@@ -302,7 +189,7 @@ function closeAnalysis() {
 
 /* ─────────────────────────────────────────
    IMAGE UPLOAD
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 function initializeAnalysisUpload() {
   const input = document.getElementById("analysisInput");
@@ -340,7 +227,7 @@ function initializeAnalysisUpload() {
 
 /* ─────────────────────────────────────────
    RUN ANALYSIS
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 async function runAnalysis() {
   if (!selectedFile) {
@@ -395,7 +282,7 @@ async function runAnalysis() {
 }
 /* ─────────────────────────────────────────
    DOWNLOAD REPORT
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 async function downloadReport(item) {
   try {
@@ -489,7 +376,7 @@ async function downloadReport(item) {
 
 /* ─────────────────────────────────────────
    BLOB TO BASE64
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 function blobToBase64(blob) {
   return new Promise((resolve) => {
@@ -503,7 +390,7 @@ function blobToBase64(blob) {
 
 /* ─────────────────────────────────────────
    LOGOUT
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 async function logout() {
   try {
@@ -521,7 +408,7 @@ async function logout() {
 
 /* ─────────────────────────────────────────
    INIT
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 loadUser();
 
