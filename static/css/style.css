@@ -858,5 +858,23 @@ footer {
 
   .stat {
     min-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+  }
+  
+  .stat:last-child {
+    border-bottom: none;
+  }
+
+  .sub-leaves {
+    grid-template-columns: 1fr;
+  }
+  
+  .tree-node {
+    min-width: 100%;
+  }
+  
+  .flow-container {
+    padding: 20px;
   }
 }

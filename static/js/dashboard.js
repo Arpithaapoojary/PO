@@ -147,6 +147,10 @@ async function loadHistory() {
               ? `<div class="doctor-note">
                   <div class="doctor-note-label">Doctor Review</div>
                   <div class="doctor-note-text">${item.doctor_note}</div>
+                  ${item.medication ? `
+                  <div class="doctor-note-label" style="margin-top: 8px;">E-Prescription</div>
+                  <div class="doctor-note-text"><strong>${item.medication}</strong> - ${item.dosage} for ${item.duration}</div>
+                  ` : ''}
                 </div>`
               : `<div class="doctor-note">
                   <div class="doctor-note-label">Review Status</div>
@@ -345,6 +349,9 @@ async function downloadReport(item) {
         gradcam_image: gradcamBase64,
 
         doctor_note: item.doctor_note || "",
+        medication: item.medication || "",
+        dosage: item.dosage || "",
+        duration: item.duration || "",
 
         review_status: item.review_status || "Pending",
       }),

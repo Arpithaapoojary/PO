@@ -99,6 +99,13 @@ def init_db():
         FOREIGN KEY (prediction_id) REFERENCES predictions(id)
     )''')
 
+    try:
+        c.execute("ALTER TABLE doctor_notes ADD COLUMN medication TEXT")
+        c.execute("ALTER TABLE doctor_notes ADD COLUMN dosage TEXT")
+        c.execute("ALTER TABLE doctor_notes ADD COLUMN duration TEXT")
+    except:
+        pass
+
     conn.commit()
     conn.close()
     print("Database ready.")
@@ -783,6 +790,10 @@ def generate_report():
         gradcam_image = data.get('gradcam_image')
 
         doctor_note = data.get('doctor_note', '')
+        
+        medication = data.get('medication', '')
+        dosage = data.get('dosage', '')
+        duration = data.get('duration', '')
 
         review_status = data.get(
             'review_status',
@@ -920,6 +931,13 @@ def generate_report():
             [Paragraph("<b>Review Status:</b>", body_style), Paragraph(str(review_status), body_style)],
             [Paragraph("<b>Doctor Notes:</b>", body_style), Paragraph(review_text, body_style)]
         ]
+        
+        if medication or dosage or duration:
+            rx_text = ""
+            if medication: rx_text += f"<b>Medication:</b> {medication}<br/>"
+            if dosage: rx_text += f"<b>Dosage:</b> {dosage}<br/>"
+            if duration: rx_text += f"<b>Duration:</b> {duration}"
+            rev_data.append([Paragraph("<b>E-Prescription:</b>", body_style), Paragraph(rx_text, body_style)])
         rev_table = Table(rev_data, colWidths=[120, 300])
         rev_table.setStyle(TableStyle([
             ('VALIGN', (0,0), (-1,-1), 'TOP'),
@@ -995,6 +1013,9 @@ def add_note():
     prediction_id = data.get('prediction_id')
     note = data.get('note', '').strip()
     status = data.get('status', 'Approved')
+    medication = data.get('medication', '').strip()
+    dosage = data.get('dosage', '').strip()
+    duration = data.get('duration', '').strip()
 
     if not prediction_id or not note:
         return jsonify({
@@ -1006,13 +1027,16 @@ def add_note():
     conn.execute(
         '''
         INSERT INTO doctor_notes
-        (doctor_id, prediction_id, note)
-        VALUES (?, ?, ?)
+        (doctor_id, prediction_id, note, medication, dosage, duration)
+        VALUES (?, ?, ?, ?, ?, ?)
         ''',
         (
             session['user_id'],
             prediction_id,
-            note
+            note,
+            medication,
+            dosage,
+            duration
         )
     )
 
@@ -1057,7 +1081,10 @@ def history():
 
             SELECT
                 p.*,
-                dn.note as doctor_note
+                dn.note as doctor_note,
+                dn.medication,
+                dn.dosage,
+                dn.duration
 
             FROM predictions p
 
@@ -1081,7 +1108,10 @@ def history():
             SELECT
                 p.*,
                 u.name as patient_name,
-                dn.note as doctor_note
+                dn.note as doctor_note,
+                dn.medication,
+                dn.dosage,
+                dn.duration
 
             FROM predictions p
 

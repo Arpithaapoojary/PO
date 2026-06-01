@@ -165,6 +165,11 @@
           </div>
         </div>
       </main>
+      
+      <!-- Educational / Research Disclaimer -->
+      <div style="text-align: center; font-size: 11px; color: var(--text-muted); padding: 20px; border-top: 1px solid rgba(226, 232, 240, 0.6); margin-top: auto;">
+        Disclaimer: This system is designed for clinical training, support, and educational research purposes.
+      </div>
     </div>
 
     <!-- CLINICAL VALIDATION OVERLAY MODAL -->
@@ -225,6 +230,22 @@
             class="review-textarea"
             placeholder="Type clinical diagnosis, therapeutic suggestions, or medical notes to be compiled into the PDF report..."
           ></textarea>
+        </div>
+
+        <!-- E-PRESCRIPTION FIELDS -->
+        <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div style="grid-column: span 2;">
+            <label for="medication" style="font-size: 13px; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Medication</label>
+            <input type="text" id="medication" class="review-textarea" style="min-height: 40px; padding: 10px;" placeholder="e.g., Hydrocortisone Cream 1%">
+          </div>
+          <div>
+            <label for="dosage" style="font-size: 13px; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Dosage</label>
+            <input type="text" id="dosage" class="review-textarea" style="min-height: 40px; padding: 10px;" placeholder="e.g., Apply twice daily">
+          </div>
+          <div>
+            <label for="duration" style="font-size: 13px; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Duration</label>
+            <input type="text" id="duration" class="review-textarea" style="min-height: 40px; padding: 10px;" placeholder="e.g., 7 days">
+          </div>
         </div>
 
         <!-- CLINICIAN ACTION CONTROLS -->

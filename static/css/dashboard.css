@@ -1277,3 +1277,47 @@ body {
     gap: 16px;
   }
 }
+
+@media (max-width: 480px) {
+  .topnav {
+    padding: 0 16px;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .welcome-banner {
+    padding: 24px 16px;
+  }
+
+  .welcome-heading {
+    font-size: 22px;
+  }
+
+  .stats, .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analysis-box {
+    padding: 20px;
+  }
+
+  .review-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .review-actions button {
+    width: 100%;
+  }
+
+  .section-head, .history-body {
+    padding: 16px;
+  }
+
+  /* Handle inline grids on mobile */
+  div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}

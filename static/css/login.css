@@ -633,4 +633,10 @@ select option {
   .right-panel { 
     padding: 36px 20px; 
   }
+  .inline-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-logo {
+    font-size: 20px;
+  }
 }

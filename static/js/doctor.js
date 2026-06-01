@@ -5,6 +5,37 @@
 let currentPredictionId = null;
 
 /* ─────────────────────────────────────────
+   LOAD USER
+   ───────────────────────────────────────── */
+
+async function loadUser() {
+  try {
+    const res = await fetch("/api/me", {
+      credentials: "include",
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      window.location.href = "/login";
+      return;
+    }
+
+    if (data.role !== "doctor") {
+      window.location.href = "/dashboard";
+      return;
+    }
+
+    document.getElementById("welcomeText").textContent = `Welcome back, Dr. ${data.name}`;
+    document.getElementById("sidebarName").textContent = `Dr. ${data.name}`;
+    document.getElementById("sidebarRole").textContent = "Dermatologist";
+    document.getElementById("sidebarAvatar").textContent = data.name ? data.name.charAt(0).toUpperCase() : "?";
+  } catch (err) {
+    window.location.href = "/login";
+  }
+}
+
+/* ─────────────────────────────────────────
    LOAD CASES
    ───────────────────────────────────────── */
 
@@ -117,6 +148,9 @@ function openReview(item) {
     item.stage2_conf + "%";
 
   document.getElementById("doctorNote").value = item.doctor_note || "";
+  document.getElementById("medication").value = item.medication || "";
+  document.getElementById("dosage").value = item.dosage || "";
+  document.getElementById("duration").value = item.duration || "";
 }
 
 /* ─────────────────────────────────────────
@@ -133,6 +167,9 @@ function closeReview() {
 
 async function submitReview(status) {
   const note = document.getElementById("doctorNote").value;
+  const medication = document.getElementById("medication").value;
+  const dosage = document.getElementById("dosage").value;
+  const duration = document.getElementById("duration").value;
 
   if (!note) {
     alert("Please write review");
@@ -154,6 +191,9 @@ async function submitReview(status) {
         prediction_id: currentPredictionId,
 
         note: note,
+        medication: medication,
+        dosage: dosage,
+        duration: duration,
 
         status: status,
       }),
@@ -195,4 +235,5 @@ async function logout() {
    INIT
    ───────────────────────────────────────── */
 
+loadUser();
 loadCases();
